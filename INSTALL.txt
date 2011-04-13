@@ -1,5 +1,7 @@
 Installing assemblathon.
 
+Tip: place all the downloaded projects in the same root directory, this way no makefile variables need be edited and the python path needs to be pointed at this base directory.
+
 (1) Download and install assemblaLib (this will involve installing cactus and sonLib).
 
 (2) Place the directory containing assemblathon on your python path, i.e.
@@ -11,3 +13,4 @@ Modify the rootPath variable in the src/Makefile to point at where you installed
 In the base directory type 'make all' 
 
 See https://github.com/benedictpaten/ for different projects.
+
