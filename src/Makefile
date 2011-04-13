@@ -1,4 +1,4 @@
-rootPath=../../git/cactus/
+rootPath=../../cactus/
 include ${rootPath}include.mk
 binPath=../bin
 
