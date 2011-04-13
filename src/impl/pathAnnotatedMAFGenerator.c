@@ -1,0 +1,158 @@
+/*
+ * Copyright (C) 2009-2011 by Benedict Paten (benedictpaten@gmail.com)
+ *
+ * Released under the MIT license, see LICENSE.txt
+ */
+
+#include "cactus.h"
+#include "cactusMafs.h"
+#include "haplotypePaths.h"
+#include "adjacencyTraversal.h"
+#include "adjacencyClassification.h"
+#include "scaffoldPaths.h"
+#include "assemblaCommon.h"
+
+stHash *segmentsToMaximalHaplotypePaths;
+stHash *maximalHaplotypePathLengths;
+stHash *maximalScaffoldPathsLengths;
+stList *eventStrings;
+
+static int32_t getNumberOnPositiveStrand(Block *block) {
+    Block_InstanceIterator *it = block_getInstanceIterator(block);
+    Segment *segment;
+    int32_t i = 0;
+    while ((segment = block_getNext(it)) != NULL) {
+        if (segment_getChildNumber(segment) == 0) {
+            if (segment_getStrand(segment)) {
+                i++;
+            }
+        }
+    }
+    block_destructInstanceIterator(it);
+    return i;
+}
+
+int getSimpleCode(enum CapCode code) {
+    switch (code) {
+        case HAP_SWITCH:
+        case HAP_NOTHING:
+            return 1;
+        case CONTIG_END:
+        case CONTIG_END_WITH_SCAFFOLD_GAP:
+        case CONTIG_END_WITH_AMBIGUITY_GAP:
+            return 0;
+        case SCAFFOLD_GAP:
+        case AMBIGUITY_GAP:
+            return 3;
+        case ERROR_HAP_TO_HAP_SAME_CHROMOSOME:
+        case ERROR_HAP_TO_HAP_DIFFERENT_CHROMOSOMES:
+        case ERROR_HAP_TO_CONTAMINATION:
+        case ERROR_HAP_TO_INSERT_TO_CONTAMINATION:
+        case ERROR_HAP_TO_INSERT:
+        case ERROR_HAP_TO_INSERT_AND_DELETION:
+        case ERROR_HAP_TO_DELETION:
+        case ERROR_CONTIG_END_WITH_INSERT:
+            return 2;
+        default:
+            assert(0);
+    }
+    assert(0);
+    return 2;
+}
+
+void getMAFBlock2(Block *block, FILE *fileHandle) {
+    /*
+     * Prints out the comment lines, then the maf blocks.
+     */
+    if (getNumberOnPositiveStrand(block) == 0) {
+        block = block_getReverse(block);
+    }
+    Segment *segment;
+    Block_InstanceIterator *instanceIt = block_getInstanceIterator(block);
+    while ((segment = block_getNext(instanceIt)) != NULL) {
+        if (strcmp(event_getHeader(segment_getEvent(segment)), assemblyEventString) == 0) { //Establish if we need a line..
+            stList *maximalHaplotypePath = stHash_search(
+                    segmentsToMaximalHaplotypePaths, segment);
+            if (maximalHaplotypePath == NULL) {
+                maximalHaplotypePath = stHash_search(
+                        segmentsToMaximalHaplotypePaths, segment_getReverse(
+                                segment));
+            }
+            if (maximalHaplotypePath != NULL) {
+                assert(stHash_search(maximalHaplotypePathLengths,
+                        maximalHaplotypePath) != NULL);
+                int32_t length = stIntTuple_getPosition(stHash_search(
+                        maximalHaplotypePathLengths, maximalHaplotypePath), 0);
+                assert(stHash_search(maximalScaffoldPathsLengths,
+                        maximalHaplotypePath) != NULL);
+                int32_t scaffoldPathLength = stIntTuple_getPosition(
+                        stHash_search(maximalScaffoldPathsLengths,
+                                maximalHaplotypePath), 0);
+                assert(scaffoldPathLength >= length);
+                /*
+                 * Codes:
+                 * 0 = contig ends.
+                 * 1 = correct adjacency.
+                 * 2 = error adjacency.
+                 * 3 = scaffold gap
+                 */
+
+                int32_t insertLength;
+                int32_t deleteLength;
+                enum CapCode _5EndStatusNerd = getCapCode(segment_get5Cap(
+                        segment), eventStrings, &insertLength, &deleteLength, capCodeParameters);
+                enum CapCode _3EndStatusNerd = getCapCode(segment_get3Cap(
+                        segment), eventStrings, &insertLength, &deleteLength, capCodeParameters);
+
+                int32_t _5EndStatus = getSimpleCode(_5EndStatusNerd);
+                int32_t _3EndStatus = getSimpleCode(_3EndStatusNerd);
+
+                fprintf(
+                        fileHandle,
+                        "#HPL=%i 5=%i 3=%i SPL=%i 5NERD=%i 3NERD=%i\n",
+                        length, _5EndStatus, _3EndStatus,
+                        scaffoldPathLength,
+                        _5EndStatusNerd, _3EndStatusNerd);
+            }
+        }
+    }
+    block_destructInstanceIterator(instanceIt);
+
+    getMAFBlock(block, fileHandle);
+}
+
+int main(int argc, char *argv[]) {
+    //////////////////////////////////////////////
+    //Parse the inputs
+    //////////////////////////////////////////////
+
+    parseBasicArguments(argc, argv, "pathAnnotatedMafGenerator");
+
+    //////////////////////////////////////////////
+    //Get the maximal haplotype path info.
+    //////////////////////////////////////////////
+
+    eventStrings = getEventStrings(hap1EventString, hap2EventString);
+    stList *maximalHaplotypePaths = getContigPaths(flower, assemblyEventString, eventStrings);
+    segmentsToMaximalHaplotypePaths = buildSegmentToContigPathHash(
+            maximalHaplotypePaths);
+    maximalHaplotypePathLengths
+            = buildContigPathToContigPathLengthHash(
+                    maximalHaplotypePaths);
+    maximalScaffoldPathsLengths = getMaximalScaffoldPathLengths(
+            maximalHaplotypePaths, eventStrings, capCodeParameters);
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Now print the MAFs
+    ///////////////////////////////////////////////////////////////////////////
+
+    int64_t startTime = time(NULL);
+    FILE *fileHandle = fopen(outputFile, "w");
+    makeMAFHeader(flower, fileHandle);
+    getMAFsReferenceOrdered(flower, fileHandle, getMAFBlock2);
+
+    fclose(fileHandle);
+    st_logInfo("Got the mafs in %i seconds/\n", time(NULL) - startTime);
+
+    return 0;
+}
