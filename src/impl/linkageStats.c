@@ -4,22 +4,8 @@
  * Released under the MIT license, see LICENSE.txt
  */
 
-#include <assert.h>
-#include <limits.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <getopt.h>
-#include <ctype.h>
-#include <math.h>
-
 #include "sonLib.h"
 #include "cactus.h"
-#include "avl.h"
-#include "commonC.h"
-#include "hashTableC.h"
-#include "treeStats.h"
 #include "cactusMafs.h"
 #include "adjacencyTraversal.h"
 #include "assemblaCommon.h"

@@ -6,7 +6,7 @@
 
 #include "cactus.h"
 #include "cactusMafs.h"
-#include "haplotypePaths.h"
+#include "contigPaths.h"
 #include "adjacencyTraversal.h"
 #include "adjacencyClassification.h"
 #include "scaffoldPaths.h"
