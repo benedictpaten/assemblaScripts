@@ -1,0 +1,13 @@
+Installing assemblathon.
+
+(1) Download and install assemblaLib (this will involve installing cactus and sonLib).
+
+(2) Place the directory containing assemblathon on your python path, i.e.
+PYTHONPATH=${PYTHONPATH}:FOO
+where FOO/assemblaLib is the path to the base directory of assemblaLib. 
+
+(3) Compile the C code:
+Modify the rootPath variable in the src/Makefile to point at where you installed cactus.
+In the base directory type 'make all' 
+
+See https://github.com/benedictpaten/ for different projects.
