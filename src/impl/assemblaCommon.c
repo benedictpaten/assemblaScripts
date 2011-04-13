@@ -1,8 +1,7 @@
 /*
- * assemblaCommon.c
+ * Copyright (C) 2009-2011 by Benedict Paten (benedictpaten (at) gmail.com) and Dent Earl (dearl (at) soe.ucsc.edu)
  *
- *  Created on: 11 Apr 2011
- *      Author: benedictpaten
+ * Released under the MIT license, see LICENSE.txt
  */
 
 #include <assert.h>

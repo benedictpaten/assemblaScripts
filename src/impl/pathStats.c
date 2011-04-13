@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2011 by Benedict Paten (benedictpaten@gmail.com)
+ * Copyright (C) 2009-2011 by Benedict Paten (benedictpaten (at) gmail.com) and Dent Earl (dearl (at) soe.ucsc.edu)
  *
  * Released under the MIT license, see LICENSE.txt
  */
