@@ -5,6 +5,7 @@ This is a set of evaluation scripts developed by [Dent Earl](https://github.com/
 ##Dependencies
 
 * [jobTree](https://github.com/benedictpaten/jobTree)
+* [sonLib](https://github.com/benedictpaten/sonLib)
 * [cactus](https://github.com/benedictpaten/cactus)
 * [assemblaLib](https://github.com/benedictpaten/assemblaLib)
 
