@@ -182,13 +182,13 @@ class MakeSubstitutionStats(MakeStats1):
     """Makes substitution stats.
     """
     def run(self):
-        outputFile = os.path.join(self.outputDir, "substitutionStats_1000_98_5.txt")
+        outputFile = os.path.join(self.outputDir, "substitutionStats_1000_98_5.xml")
         self.runScript("substitutionStats", outputFile, "--ignoreFirstNBases 5 --minimumBlockLength 1000 --minimumIdentity 98")
         
-        outputFile = os.path.join(self.outputDir, "substitutionStats_1000_98_5_indel_positions.txt")
+        outputFile = os.path.join(self.outputDir, "substitutionStats_1000_98_5_indel_positions.xml")
         self.runScript("substitutionStats", outputFile, "--ignoreFirstNBases 5 --minimumBlockLength 1000 --minimumIdentity 98 --printIndelPositions")
         
-        outputFile = os.path.join(self.outputDir, "substitutionStats_0_0_0.txt")
+        outputFile = os.path.join(self.outputDir, "substitutionStats_0_0_0.xml")
         self.runScript("substitutionStats", outputFile, "--ignoreFirstNBases 0 --minimumBlockLength 0")
         
         self.addChildTarget(MakeCopyNumberStats(self.outputDir, self.alignment, self.options))

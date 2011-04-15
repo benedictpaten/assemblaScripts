@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
         "totalHeterozygous=\"%i\" "
         "totalCorrectInHeterozygous=\"%f\" "
         "totalErrorsInHeterozygous=\"%i\" "
-        "totalCallsInHeterozygous=\"%i\""
+        "totalCallsInHeterozygous=\"%i\" "
         "totalInOneHaplotypeOnly=\"%i\" "
         "totalCorrectInOneHaplotypeOnly=\"%f\" "
         "totalErrorsInOneHaplotypeOnly=\"%i\" "
