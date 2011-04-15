@@ -9,8 +9,8 @@ Tip: place all the downloaded projects in the same root directory, this way no m
     <code>PYTHONPATH=${PYTHONPATH}:FOO</code>
 
 where <code>FOO/assemblaLib</code> is the path to the parent directory of assemblaLib. 
-4. Compile the C code:
-Modify the <code>rootPath</code> variable in the src/Makefile to point at where you installed cactus.
-In the base directory type '<code>make all</code>' 
 
-See https://github.com/benedictpaten/ for different projects.
+4. Compile the C code: Modify the <code>rootPath</code> variable in the src/Makefile to point at where you installed cactus.
+In the base directory type <code>make all</code>
+
+See [https://github.com/benedictpaten/](https://github.com/benedictpaten/) for different projects.
