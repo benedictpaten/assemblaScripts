@@ -6,7 +6,7 @@ Tip: place all the downloaded projects in the same root directory, this way no m
 2. Download and install [jobTree](https://github.com/benedictpaten/jobTree)
 3. Place the directory containing assemblathon on your python path environmental variable, i.e.
 
-    PYTHONPATH=${PYTHONPATH}:FOO
+    <code>PYTHONPATH=${PYTHONPATH}:FOO</code>
 
 where <code>FOO/assemblaLib</code> is the path to the parent directory of assemblaLib. 
 4. Compile the C code:
