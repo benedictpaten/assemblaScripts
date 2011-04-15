@@ -390,7 +390,7 @@ int main(int argc, char *argv[]) {
     printCumulativeLengthPlots(blockHolders, blockHolder_compareByBlockLength,
             blockHolder_getHaplotypeCategory, blockHolder_getBlockLength, 8,
             haplotypeCategoryNames, stString_print(
-                    "%s/blocksLengthsVsCoverageOfAssemblyAndHaplotypes.txt", outputFile));
+                    "%s/blockLengthsVsCoverageOfAssemblyAndHaplotypes.txt", outputFile));
     printCumulativeLengthPlots(blockHolders,
             blockHolder_compareByHaplotypePathLength,
             blockHolder_getHaplotypeCategory,
@@ -412,7 +412,7 @@ int main(int argc, char *argv[]) {
     printCumulativeLengthPlots(blockHolders, blockHolder_compareByBlockLength,
             blockHolder_getContaminationCategory, blockHolder_getBlockLength, 4,
             contaminationCategoryNames, stString_print(
-                    "%s/blocksLengthsVsCoverageOfAssemblyAndContamination.txt", outputFile));
+                    "%s/blockLengthsVsCoverageOfAssemblyAndContamination.txt", outputFile));
     printCumulativeLengthPlots(blockHolders, blockHolder_compareByContigLength,
             blockHolder_getContaminationCategory, blockHolder_getContigLength, 4,
             contaminationCategoryNames, stString_print(
@@ -428,7 +428,7 @@ int main(int argc, char *argv[]) {
     printCumulativeLengthPlots(blockHolders, blockHolder_compareByContigLength,
             blockHolder_getHaplotypeContaminationCategory, blockHolder_getContigLength,
             4, contaminationHaplotypeCategoryNames, stString_print(
-                    "%s/contigsLengthsVsCoverageOfHaplotypesAndContamination.txt", outputFile));
+                    "%s/contigLengthsVsCoverageOfHaplotypesAndContamination.txt", outputFile));
 
     return 0;
 }

@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
     fprintf(fileHandle, "totalHomozygous=\"%i\" "
         "totalCorrectInHomozygous=\"%f\" "
         "totalErrorsInHomozygous=\"%i\" "
-        "totalCallsInHomozygous=\"%i\""
+        "totalCallsInHomozygous=\"%i\" "
         "totalHeterozygous=\"%i\" "
         "totalCorrectInHeterozygous=\"%f\" "
         "totalErrorsInHeterozygous=\"%i\" "
