@@ -1,3 +1,5 @@
+.PHONY: all clean cleanTest test testBig testLittle testStatic run scaffolds contigs static
+
 all : 
 	cd src && make all
 
@@ -10,6 +12,11 @@ clean :
 	cd assemblathon1/contigs && make clean
 	cd assemblathon1/static && make clean
 
+cleanTest :
+	cd tests/big && make clean
+	cd tests/little && make clean
+	cd tests/static && make clean
+
 test : testBig testLittle testLittleStatic 
 
 testBig :
@@ -17,7 +24,7 @@ testBig :
 
 testLittle :
 	cd tests/little && make all
-	
+
 testStatic :
 	cd tests/static && make all
 
@@ -25,7 +32,7 @@ run : scaffolds contigs static
 
 scaffolds :
 	cd assemblathon1/scaffolds && make all
-	
+
 contigs : 
 	cd assemblathon1/contigs && make all
 
