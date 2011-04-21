@@ -31,8 +31,8 @@ def getRootPathString():
     function for finding external location
     """
     import os
-    import assemblathon.bin.pipeline
-    i = os.path.abspath(assemblathon.bin.pipeline.__file__)
+    import assemblaScripts.bin.pipeline
+    i = os.path.abspath(assemblaScripts.bin.pipeline.__file__)
     return os.path.split(os.path.split(i)[0])[0] #os.path.split(os.path.split(os.path.split(i)[0])[0])[0]
 
 def getCactusDiskString(alignmentFile):
