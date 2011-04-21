@@ -52,7 +52,7 @@ class MakeAlignment(Target):
         self.options = options
     
     def run(self):
-        cactusAlignmentName = "cactusAlignent"
+        cactusAlignmentName = "cactusAlignment"
         cactusAlignment = os.path.join(self.outputDir, cactusAlignmentName)
         if not os.path.exists(cactusAlignment):
             #Prepare the assembly

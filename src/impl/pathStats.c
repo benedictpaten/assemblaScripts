@@ -90,8 +90,8 @@ void reportHaplotypePathStatsP(Cap *cap, stList *eventStrings, CapCodeParameters
 }
 
 static int32_t totalPathLength = 0; //sum of all blocks containing haplotype and assembly.
-static int32_t genotypeLength = 0; //sum of all blocks containing haplotype.
 static stSortedSet *contigsSet;
+static stSortedSet *haplotypesSet;
 static stList *blockList;
 
 int compareSequences(const void *a, const void *b) {
@@ -128,7 +128,7 @@ static int compareScaffoldPaths(const void *a, const void *b) {
 
 void accumulateBlock(Block *block, const char *assemblyEventString, stList *eventStrings) {
     if (hasCapInEvents(block_get5End(block), eventStrings)) {
-        genotypeLength += block_getLength(block);
+        //genotypeLength += block_getLength(block);
         if (hasCapInEvent(block_get5End(block), assemblyEventString)) {
             stList_append(blockList, block);
             totalPathLength += block_getLength(block);
@@ -141,6 +141,11 @@ void accumulateBlock(Block *block, const char *assemblyEventString, stList *even
         assert(sequence != NULL);
         if (strcmp(event_getHeader(segment_getEvent(segment)), assemblyEventString) == 0) {
             stSortedSet_insert(contigsSet, sequence);
+        }
+        assert(stList_length(eventStrings) == 2);
+        if (strcmp(event_getHeader(segment_getEvent(segment)), stList_get(eventStrings, 0)) == 0 ||
+                strcmp(event_getHeader(segment_getEvent(segment)), stList_get(eventStrings, 1)) == 0) {
+            stSortedSet_insert(haplotypesSet, sequence);
         }
     }
     block_destructInstanceIterator(instanceIt);
@@ -242,10 +247,12 @@ void reportHaplotypePathStats(Flower *flower, FILE *fileHandle,
 
     blockList = stList_construct();
     contigsSet = stSortedSet_construct3(compareSequences, NULL);
+    haplotypesSet = stSortedSet_construct3(compareSequences, NULL);
 
     traverseBlocks(flower, assemblyEventString, eventStrings);
 
     stList *sequences = stSortedSet_getList(contigsSet);
+    stList *haplotypes = stSortedSet_getList(haplotypesSet);
     stList_sort(blockList, compareBlocksByLength);
     stList_sort(sequences, compareSequencesByLength);
     stList_sort(maximalHaplotypePaths, compareMaximalHaplotypePaths);
@@ -257,12 +264,18 @@ void reportHaplotypePathStats(Flower *flower, FILE *fileHandle,
         totalSequencesLength += sequence_getLength(stList_get(sequences, i));
     }
 
+    int32_t averageHaplotypeLength = 0; //average length of the two haplotypes.
+    for (int32_t i = 0; i < stList_length(haplotypes); i++) {
+        averageHaplotypeLength += sequence_getLength(stList_get(haplotypes, i));
+    }
+    averageHaplotypeLength /= 2;
+
     int32_t totalBlockNumber = stList_length(blockList);
-    int32_t blockN50 = getN50(genotypeLength, blockList, (int32_t(*)(const void *)) block_getLength);
+    int32_t blockNG50 = getN50(averageHaplotypeLength, blockList, (int32_t(*)(const void *)) block_getLength);
     int32_t contigN50 = getN50(totalSequencesLength, sequences, (int32_t(*)(const void *)) sequence_getLength); //length of contig which appears in order (from longest to shortest) at 50% coverage.
-    int32_t contigNA50 = getN50(genotypeLength, sequences, (int32_t(*)(const void *)) sequence_getLength); //length of contig which appears in order (from longest to shortest) at 50% coverage.
-    int32_t haplotypePathNA50 = getN50(genotypeLength, maximalHaplotypePaths, getHaplotypePathLength); //length of maximal haplotype path which appears in order (from longest to shortest) at 50% coverage.
-    int32_t scaffoldPathNA50 = getN50(genotypeLength, scaffoldPaths, getScaffoldPathLength); //length of maximal scaffold path which appears in order (from longest to shortest) at 50% coverage.
+    int32_t contigNG50 = getN50(averageHaplotypeLength, sequences, (int32_t(*)(const void *)) sequence_getLength); //length of contig which appears in order (from longest to shortest) at 50% coverage.
+    int32_t haplotypePathNG50 = getN50(averageHaplotypeLength, maximalHaplotypePaths, getHaplotypePathLength); //length of maximal haplotype path which appears in order (from longest to shortest) at 50% coverage.
+    int32_t scaffoldPathNG50 = getN50(averageHaplotypeLength, scaffoldPaths, getScaffoldPathLength); //length of maximal scaffold path which appears in order (from longest to shortest) at 50% coverage.
 
     int32_t totalContigNumber = stSortedSet_size(contigsSet); //number of contigs
     int32_t totalHaplotypePaths = stList_length(maximalHaplotypePaths); //number of haplotype paths
@@ -274,7 +287,7 @@ void reportHaplotypePathStats(Flower *flower, FILE *fileHandle,
 
     double errorsPerContig = ((double) totalErrors) / totalContigNumber; //number of errors / number of contigs
     double errorsPerMappedBase = ((double) totalErrors) / totalPathLength; //number of errors / total path length
-    double coverage = ((double) totalPathLength) / genotypeLength; //totalPathLength/genotypeLength
+    double coverage = ((double) totalPathLength) / averageHaplotypeLength; //totalPathLength/genotypeLength
 
 
     assert(totalErrorsHapToHapSameChromosome % 2 == 0);
@@ -302,8 +315,8 @@ void reportHaplotypePathStats(Flower *flower, FILE *fileHandle,
         "totalErrorsHaplotypeToInsertionAndDeletion=\"%i\" "
         "totalErrorsContigEndsWithInsert=\"%i\" "
         "totalErrors=\"%i\" totalPathLength=\"%i\" genotypeLength=\"%i\" "
-        "totalContigsLength=\"%i\" coverage=\"%f\" blockN50=\"%i\" contigN50=\"%i\" "
-        "contigNA50=\"%i\" haplotypePathN50=\"%i\" scaffoldPathN50=\"%i\" totalBlockNumber=\"%i\" "
+        "totalContigsLength=\"%i\" coverage=\"%f\" blockNG50=\"%i\" contigN50=\"%i\" "
+        "contigNG50=\"%i\" contigPathNG50=\"%i\" scaffoldPathNG50=\"%i\" totalBlockNumber=\"%i\" "
         "totalContigNumber=\"%i\" totalHaplotypePaths=\"%i\" totalScaffoldPaths=\"%i\" "
         "errorsPerContig=\"%f\" errorsPerMappedBase=\"%f\" "
         "insertionErrorSizeDistribution=\"%s\" "
@@ -312,8 +325,8 @@ void reportHaplotypePathStats(Flower *flower, FILE *fileHandle,
             totalContigEndsWithsNs, totalErrorsHapToHapSameChromosome / 2, totalErrorsHapToHapDifferentChromosome / 2,
             totalErrorsHapToContamination, totalErrorsHapToInsertToContamination, totalErrorsHapToInsert / 2,
             totalErrorsHapToDeletion / 2, totalErrorsHapToInsertionAndDeletion / 2, totalErrorsContigEndsWithInsert,
-            totalErrors, totalPathLength, genotypeLength, totalSequencesLength, coverage, blockN50, contigN50,
-            contigNA50, haplotypePathNA50, scaffoldPathNA50, totalBlockNumber, totalContigNumber, totalHaplotypePaths,
+            totalErrors, totalPathLength, averageHaplotypeLength, totalSequencesLength, coverage, blockNG50, contigN50,
+            contigNG50, haplotypePathNG50, scaffoldPathNG50, totalBlockNumber, totalContigNumber, totalHaplotypePaths,
             totalScaffoldPaths, errorsPerContig, errorsPerMappedBase,
             insertionDistributionString, deletionDistributionString);
 
