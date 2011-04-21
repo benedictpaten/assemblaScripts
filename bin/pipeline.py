@@ -251,6 +251,6 @@ def _test():
     return doctest.testmod()
 
 if __name__ == '__main__':
-    from assemblathon.bin.pipeline import *
+    from assemblaScripts.bin.pipeline import *
     _test()
     main()
