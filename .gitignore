@@ -3,3 +3,4 @@ bin/*
 data/*
 tests/*/jobTree/*
 /bin
+/data
