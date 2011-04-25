@@ -1,31 +1,28 @@
-rootPath=../../cactus/
-include ${rootPath}include.mk
-binPath=../bin
+rootPath=../
+cactusRootPath=${rootPath}/../cactus
+cactusLibPath=${cactusRootPath}/lib
+cactusToolsLibPath=${rootPath}/../cactusTools/lib
+assemblaLibPath=${rootPath}/../assemblaLib/lib
+
+include ${cactusRootPath}/include.mk
+
+binPath=${rootPath}/bin
 
 libSources = impl/*.c
 libHeaders = inc/*.h
 commonSources = impl/assemblaCommon.c
 
-all : ${binPath}/coveragePlots ${binPath}/substitutionStats ${binPath}/pathAnnotatedMafGenerator ${binPath}/pathStats ${binPath}/copyNumberStats ${binPath}/linkageStats  
+extraLibs=${cactusLibPath}/cactusLib.a ${cactusToolsLibPath}/cactusMafs.a ${cactusToolsLibPath}/cactusTreeStats.a ${assemblaLibPath}/assemblaLib.a
 
-${binPath}/coveragePlots :  ${libSources} ${libHeaders} ${libPath}/cactusTreeStats.a  ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibsDependencies}
-	${cxx} ${cflags} -I${libPath} -I inc -o ${binPath}/coveragePlots impl/coveragePlots.c ${commonSources} ${libPath}/cactusTreeStats.a ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibs}
+programs = coveragePlots substitutionStats pathAnnotatedMafGenerator pathStats copyNumberStats linkageStats
 
-${binPath}/substitutionStats : ${libSources} ${libHeaders} ${libPath}/cactusMafs.a ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibsDependencies}
-	${cxx} ${cflags} -I${libPath} -I inc -o ${binPath}/substitutionStats impl/substitutionStats.c ${commonSources} ${libPath}/cactusMafs.a ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibs}
+all : ${programs:%=${binPath}/%}
 
-${binPath}/copyNumberStats : ${libSources} ${libHeaders} ${libPath}/cactusMafs.a ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibsDependencies}
-	${cxx} ${cflags} -I${libPath} -I inc -o ${binPath}/copyNumberStats impl/copyNumberStats.c ${commonSources} ${libPath}/cactusMafs.a ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibs}
+${binPath}/%: ${basicLibsDependencies} ${extraLibs}
+	${cxx} ${cflags} -I ${cactusLibPath} -I ${cactusToolsLibPath} -I ${assemblaLibPath} -I ${libPath} -I inc -o ${binPath}/$* impl/$*.c ${commonSources} ${extraLibs} ${basicLibs} 
 
-${binPath}/linkageStats : ${libSources} ${libHeaders} ${libPath}/cactusMafs.a ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibsDependencies}
-	${cxx} ${cflags} -I${libPath} -I inc -o ${binPath}/linkageStats impl/linkageStats.c ${commonSources} ${libPath}/cactusMafs.a ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibs}
+clean : ${programs:%=%.clean} 
+	rm -rf *.o ${binPath}/*.dSYM
 
-${binPath}/pathStats : ${libSources} ${libHeaders} ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibsDependencies}
-	${cxx} ${cflags} -I${libPath} -I inc -o ${binPath}/pathStats impl/pathStats.c ${commonSources} ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibs}
-
-${binPath}/pathAnnotatedMafGenerator : ${libSources} ${libHeaders} ${libPath}/cactusMafs.a ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibsDependencies}
-	${cxx} ${cflags} -I${libPath} -I inc -o ${binPath}/pathAnnotatedMafGenerator impl/pathAnnotatedMAFGenerator.c ${commonSources} ${libPath}/cactusMafs.a ${libPath}/cactusLib.a ${libPath}/assemblaLib.a ${basicLibs}
-
-clean : 
-	rm -f *.o
-	rm -f ${binPath}/coveragePlots ${binPath}/pathStats ${binPath}/substitutionStats ${binPath}/pathAnnotatedMafGenerator ${binPath}/copyNumberStats ${binPath}/linkageStats
+%.clean : 
+	rm -rf ${binPath}/$*

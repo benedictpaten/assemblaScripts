@@ -1,4 +1,4 @@
-rootPath = ../../
+rootPath = ../..
 include ${rootPath}/tests/include.mk
 
 assembliesDir=${dataPath}/tests/little

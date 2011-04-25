@@ -1,7 +1,7 @@
-binPath = ${rootPath}bin
-libPath = ${rootPath}lib
-dataPath = ${rootPath}data
-outputPath = ${rootPath}output
+binPath = ${rootPath}/bin
+libPath = ${rootPath}/lib
+dataPath = ${rootPath}/data
+outputPath = ${rootPath}/output
 
 #Shared Parameters
 #jobTreeFlags = --batchSystem parasol --logDebug --retryCount 0 --maxThreads 4
