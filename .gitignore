@@ -1,6 +1,7 @@
-*pyc
+*.pyc
+*.o
+*.a
 bin/*
 data/*
-tests/*/jobTree/*
 /bin
 /data
