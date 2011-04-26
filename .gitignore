@@ -5,3 +5,4 @@ bin/*
 data/*
 /bin
 /data
+/output
