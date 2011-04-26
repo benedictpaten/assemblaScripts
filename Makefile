@@ -17,7 +17,7 @@ cleanTest:
 	cd tests/little && make clean
 	cd tests/static && make clean
 
-test: testBig testLittle testLittleStatic 
+test: testLittle testStatic 
 
 testBig:
 	cd tests/big && make all
