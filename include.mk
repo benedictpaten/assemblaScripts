@@ -5,7 +5,7 @@ outputPath = ${rootPath}/output
 
 #Shared Parameters
 #jobTreeFlags = --batchSystem parasol --logDebug --retryCount 0 --maxThreads 4
-jobTreeFlags = --batchSystem singleMachine --maxThreads 20 --logDebug --retryCount 0
+jobTreeFlags = --batchSystem singleMachine --maxThreads 10 --logDebug --retryCount 0
 configFile=${libPath}/config_fast.xml
 minimumNsForScaffoldGap=15
 
