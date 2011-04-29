@@ -14,10 +14,10 @@
 #include "assemblaCommon.h"
 #include "cactusMafs.h"
 
-int32_t totalHomozygous = 0;
-double totalCorrectInHomozygous = 0;
-int32_t totalErrorsInHomozygous = 0;
-int32_t totalCallsInHomozygous = 0;
+int32_t totalSites = 0;
+double totalCorrect = 0;
+int32_t totalErrors = 0;
+int32_t totalCalls = 0;
 
 int32_t totalHeterozygous = 0;
 double totalCorrectInHeterozygous = 0;
@@ -140,13 +140,13 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
                     if (hap1Seq != NULL) {
                         if (hap2Seq != NULL) {
                             if (toupper(hap1Seq[i]) == toupper(hap2Seq[i])) {
-                                totalHomozygous++;
+                                totalSites++;
                                 if (assemblySeq != NULL) {
-                                    totalCorrectInHomozygous += bitsScoreFn(
+                                    totalCorrect += bitsScoreFn(
                                             assemblySeq[i], hap1Seq[i]);
-                                    totalErrorsInHomozygous += correctFn(
+                                    totalErrors += correctFn(
                                             assemblySeq[i], hap1Seq[i]) ? 0 : 1;
-                                    totalCallsInHomozygous++;
+                                    totalCalls++;
                                 }
                             } else {
                                 totalHeterozygous++;
@@ -246,9 +246,9 @@ int main(int argc, char *argv[]) {
         "totalInOneHaplotypeOnly=\"%i\" "
         "totalCorrectInOneHaplotypeOnly=\"%f\" "
         "totalErrorsInOneHaplotypeOnly=\"%i\" "
-        "totalCallsInOneHaplotypeOnly=\"%i\" />", totalHomozygous,
-            totalCorrectInHomozygous, totalErrorsInHomozygous,
-            totalCallsInHomozygous, totalHeterozygous,
+        "totalCallsInOneHaplotypeOnly=\"%i\" />", totalSites,
+            totalCorrect, totalErrors,
+            totalCalls, totalHeterozygous,
             totalCorrectInHeterozygous, totalErrorsInHeterozygous,
             totalCallsInHeterozygous, totalInOneHaplotypeOnly,
             totalCorrectInOneHaplotype, totalErrorsInOneHaplotype,
