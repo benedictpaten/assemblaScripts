@@ -14,8 +14,8 @@
 
 int32_t totalHapSwitches = 0;
 
-int32_t totalContigEnds = 0;
-int32_t totalContigEndsWithsNs = 0;
+int32_t totalCleanEnds = 0;
+int32_t totalHangingEndWithsNs = 0;
 
 int32_t totalScaffoldGaps = 0;
 int32_t totalAmbiguityGaps = 0;
@@ -23,13 +23,13 @@ int32_t totalAmbiguityGaps = 0;
 int32_t totalHaplotypeLength = 0;
 
 int32_t totalErrorsHapToHapSameChromosome = 0;
-int32_t totalErrorsHapToHapDifferentChromosome = 0;
+int32_t totalErrorsInterJoin = 0;
 int32_t totalErrorsHapToContamination = 0;
 int32_t totalErrorsHapToInsertToContamination = 0;
-int32_t totalErrorsHapToInsert = 0;
-int32_t totalErrorsHapToDeletion = 0;
-int32_t totalErrorsHapToInsertionAndDeletion = 0;
-int32_t totalErrorsContigEndsWithInsert = 0;
+int32_t totalErrorsInsertion = 0;
+int32_t totalErrorsDeleteion = 0;
+int32_t totalErrorsInsertionAndDeletion = 0;
+int32_t totalErrorsHangingInsertion = 0;
 stList *insertionDistribution = NULL;
 stList *deletionDistribution = NULL;
 
@@ -42,11 +42,11 @@ void reportHaplotypePathStatsP(Cap *cap, stList *eventStrings, CapCodeParameters
         case HAP_NOTHING:
             return;
         case CONTIG_END:
-            totalContigEnds++;
+            totalCleanEnds++;
             return;
         case CONTIG_END_WITH_SCAFFOLD_GAP:
         case CONTIG_END_WITH_AMBIGUITY_GAP:
-            totalContigEndsWithsNs++;
+            totalHangingEndWithsNs++;
             return;
         case SCAFFOLD_GAP:
             totalScaffoldGaps++;
@@ -58,7 +58,7 @@ void reportHaplotypePathStatsP(Cap *cap, stList *eventStrings, CapCodeParameters
             totalErrorsHapToHapSameChromosome++;
             return;
         case ERROR_HAP_TO_HAP_DIFFERENT_CHROMOSOMES:
-            totalErrorsHapToHapDifferentChromosome++;
+            totalErrorsInterJoin++;
             return;
         case ERROR_HAP_TO_CONTAMINATION:
             totalErrorsHapToContamination++;
@@ -69,22 +69,22 @@ void reportHaplotypePathStatsP(Cap *cap, stList *eventStrings, CapCodeParameters
         case ERROR_HAP_TO_INSERT:
             assert(insertLength > 0);
             stList_append(insertionDistribution, stIntTuple_construct(1, insertLength));
-            totalErrorsHapToInsert++;
+            totalErrorsInsertion++;
             return;
         case ERROR_HAP_TO_DELETION:
             assert(deleteLength > 0);
             stList_append(deletionDistribution, stIntTuple_construct(1, deleteLength));
-            totalErrorsHapToDeletion++;
+            totalErrorsDeleteion++;
             return;
         case ERROR_HAP_TO_INSERT_AND_DELETION:
             assert(insertLength > 0);
             assert(deleteLength > 0);
             stList_append(insertionDistribution, stIntTuple_construct(1, insertLength));
             stList_append(deletionDistribution, stIntTuple_construct(1, deleteLength));
-            totalErrorsHapToInsertionAndDeletion++;
+            totalErrorsInsertionAndDeletion++;
             return;
         case ERROR_CONTIG_END_WITH_INSERT:
-            totalErrorsContigEndsWithInsert++;
+            totalErrorsHangingInsertion++;
             return;
     }
 }
@@ -220,7 +220,7 @@ char *concatenateList(stList *list) {
     return cA;
 }
 
-void reportHaplotypePathStats(Flower *flower, FILE *fileHandle,
+void reportSamplePathStats(Flower *flower, FILE *fileHandle,
         const char *assemblyEventString,
         stList *eventStrings, CapCodeParameters *capCodeParameters) {
     /*
@@ -281,9 +281,9 @@ void reportHaplotypePathStats(Flower *flower, FILE *fileHandle,
     int32_t totalHaplotypePaths = stList_length(maximalHaplotypePaths); //number of haplotype paths
     int32_t totalScaffoldPaths = stList_length(scaffoldPaths); //number of scaffold paths
 
-    int32_t totalErrors = totalErrorsHapToHapSameChromosome / 2 + totalErrorsHapToHapDifferentChromosome / 2
-            + totalErrorsHapToContamination + totalErrorsHapToInsertToContamination + totalErrorsHapToInsert / 2
-            + totalErrorsHapToDeletion / 2 + totalErrorsHapToInsertionAndDeletion / 2 + totalErrorsContigEndsWithInsert;
+    int32_t totalErrors = totalErrorsHapToHapSameChromosome / 2 + totalErrorsInterJoin / 2
+            + totalErrorsHapToContamination + totalErrorsHapToInsertToContamination + totalErrorsInsertion / 2
+            + totalErrorsDeleteion / 2 + totalErrorsInsertionAndDeletion / 2 + totalErrorsHangingInsertion;
 
     double errorsPerContig = ((double) totalErrors) / totalContigNumber; //number of errors / number of contigs
     double errorsPerMappedBase = ((double) totalErrors) / totalPathLength; //number of errors / total path length
@@ -291,10 +291,10 @@ void reportHaplotypePathStats(Flower *flower, FILE *fileHandle,
 
 
     assert(totalErrorsHapToHapSameChromosome % 2 == 0);
-    assert(totalErrorsHapToHapDifferentChromosome % 2 == 0);
-    assert(totalErrorsHapToInsert % 2 == 0);
-    assert(totalErrorsHapToDeletion % 2 == 0);
-    assert(totalErrorsHapToInsertionAndDeletion % 2 == 0);
+    assert(totalErrorsInterJoin % 2 == 0);
+    assert(totalErrorsInsertion % 2 == 0);
+    assert(totalErrorsDeleteion % 2 == 0);
+    assert(totalErrorsInsertionAndDeletion % 2 == 0);
     assert(totalScaffoldGaps % 2 == 0);
     assert(totalAmbiguityGaps % 2 == 0);
 
@@ -321,10 +321,10 @@ void reportHaplotypePathStats(Flower *flower, FILE *fileHandle,
         "errorsPerContig=\"%f\" errorsPerMappedBase=\"%f\" "
         "insertionErrorSizeDistribution=\"%s\" "
         "deletionErrorSizeDistribution=\"%s\"/>", totalHapSwitches / 2,
-            totalScaffoldGaps / 2, totalAmbiguityGaps / 2, totalContigEnds,
-            totalContigEndsWithsNs, totalErrorsHapToHapSameChromosome / 2, totalErrorsHapToHapDifferentChromosome / 2,
-            totalErrorsHapToContamination, totalErrorsHapToInsertToContamination, totalErrorsHapToInsert / 2,
-            totalErrorsHapToDeletion / 2, totalErrorsHapToInsertionAndDeletion / 2, totalErrorsContigEndsWithInsert,
+            totalScaffoldGaps / 2, totalAmbiguityGaps / 2, totalCleanEnds,
+            totalHangingEndWithsNs, totalErrorsHapToHapSameChromosome / 2, totalErrorsInterJoin / 2,
+            totalErrorsHapToContamination, totalErrorsHapToInsertToContamination, totalErrorsInsertion / 2,
+            totalErrorsDeleteion / 2, totalErrorsInsertionAndDeletion / 2, totalErrorsHangingInsertion,
             totalErrors, totalPathLength, averageHaplotypeLength, totalSequencesLength, coverage, blockNG50, contigN50,
             contigNG50, haplotypePathNG50, scaffoldPathNG50, totalBlockNumber, totalContigNumber, totalHaplotypePaths,
             totalScaffoldPaths, errorsPerContig, errorsPerMappedBase,
@@ -347,7 +347,7 @@ int main(int argc, char *argv[]) {
     int64_t startTime = time(NULL);
     FILE *fileHandle = fopen(outputFile, "w");
     stList *eventStrings = getEventStrings(hap1EventString, hap2EventString);
-    reportHaplotypePathStats(flower, fileHandle, assemblyEventString, eventStrings, capCodeParameters);
+    reportSamplePathStats(flower, fileHandle, assemblyEventString, eventStrings, capCodeParameters);
     fclose(fileHandle);
     st_logInfo("Got the stats in %i seconds/\n", time(NULL) - startTime);
 

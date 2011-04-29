@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     }
 
     stList *eventStrings = getEventStrings(hap1EventString, hap2EventString);
-    stSortedSet *sequences = getHaplotypeSequences(flower, eventStrings);
+    stSortedSet *sequences = getMetaSequencesForEvents(flower, eventStrings);
     stSortedSetIterator *it = stSortedSet_getIterator(sequences);
     MetaSequence *metaSequence;
     while ((metaSequence = stSortedSet_getNext(it)) != NULL) {

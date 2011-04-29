@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     //Parse the inputs
     //////////////////////////////////////////////
 
-    parseBasicArguments(argc, argv, "blockStats");
+    parseBasicArguments(argc, argv, "copyNumberStats");
 
     ///////////////////////////////////////////////////////////////////////////
     // Now use the MAF printing code to generate the results..
