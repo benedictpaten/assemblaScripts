@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
     maximalHaplotypePathLengths
             = buildContigPathToContigPathLengthHash(
                     maximalHaplotypePaths);
-    maximalScaffoldPathsLengths = getMaximalScaffoldPathLengths(
+    maximalScaffoldPathsLengths = getContigPathToScaffoldPathLengthsHash(
             maximalHaplotypePaths, eventStrings, capCodeParameters);
 
     ///////////////////////////////////////////////////////////////////////////

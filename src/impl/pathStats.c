@@ -229,7 +229,7 @@ void reportSamplePathStats(Flower *flower, FILE *fileHandle,
 
     stList *maximalHaplotypePaths = getContigPaths(flower, assemblyEventString, eventStrings);
     maximalHaplotypePathToLength = buildContigPathToContigPathLengthHash(maximalHaplotypePaths);
-    maximalScaffoldPathToLength = getMaximalScaffoldPathLengths(maximalHaplotypePaths, eventStrings, capCodeParameters);
+    maximalScaffoldPathToLength = getContigPathToScaffoldPathLengthsHash(maximalHaplotypePaths, eventStrings, capCodeParameters);
 
     //initialise the global arrays
     insertionDistribution = stList_construct3(0, (void(*)(void *)) stIntTuple_destruct);
