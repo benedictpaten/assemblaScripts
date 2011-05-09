@@ -33,9 +33,9 @@ int32_t totalErrorsHangingInsertion = 0;
 stList *insertionDistribution = NULL;
 stList *deletionDistribution = NULL;
 
-void reportHaplotypePathStatsP(Cap *cap, stList *eventStrings, CapCodeParameters *capCodeParameters) {
+void reportHaplotypePathStatsP(Cap *cap, stList *haplotypeEventStrings, stList *contaminationEventStrings, CapCodeParameters *capCodeParameters) {
     int32_t insertLength, deleteLength;
-    switch (getCapCode(cap, eventStrings, &insertLength, &deleteLength, capCodeParameters)) {
+    switch (getCapCode(cap, haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters)) {
         case HAP_SWITCH:
             totalHapSwitches++;
             return;
@@ -184,8 +184,8 @@ int32_t getN50(int32_t genomeLength, stList *objects, int32_t(*lengthFn)(const v
     return -1; //this should not happen!
 }
 
-stList *getScaffoldPathsList(stList *maximalHaplotypePaths, stList *eventStrings, CapCodeParameters *capCodeParameters) {
-    stHash *scaffoldPaths = getScaffoldPaths(maximalHaplotypePaths, eventStrings, capCodeParameters);
+stList *getScaffoldPathsList(stList *maximalHaplotypePaths, stList *haplotypeEventStrings, stList *contaminationEventStrings,CapCodeParameters *capCodeParameters) {
+    stHash *scaffoldPaths = getScaffoldPaths(maximalHaplotypePaths, haplotypeEventStrings, contaminationEventStrings,capCodeParameters);
     stSortedSet *bucketSet = stSortedSet_construct();
     stList *scaffoldPaths2 = stList_construct();
     stHashIterator *hashIt = stHash_getIterator(scaffoldPaths);
@@ -222,14 +222,14 @@ char *concatenateList(stList *list) {
 
 void reportSamplePathStats(Flower *flower, FILE *fileHandle,
         const char *assemblyEventString,
-        stList *eventStrings, CapCodeParameters *capCodeParameters) {
+        stList *haplotypeEventStrings, stList *contaminationEventStrings, CapCodeParameters *capCodeParameters) {
     /*
      * Gets stats on the maximal haplotype paths.
      */
 
-    stList *maximalHaplotypePaths = getContigPaths(flower, assemblyEventString, eventStrings);
+    stList *maximalHaplotypePaths = getContigPaths(flower, assemblyEventString, haplotypeEventStrings);
     maximalHaplotypePathToLength = buildContigPathToContigPathLengthHash(maximalHaplotypePaths);
-    maximalScaffoldPathToLength = getContigPathToScaffoldPathLengthsHash(maximalHaplotypePaths, eventStrings, capCodeParameters);
+    maximalScaffoldPathToLength = getContigPathToScaffoldPathLengthsHash(maximalHaplotypePaths, haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
 
     //initialise the global arrays
     insertionDistribution = stList_construct3(0, (void(*)(void *)) stIntTuple_destruct);
@@ -240,8 +240,8 @@ void reportSamplePathStats(Flower *flower, FILE *fileHandle,
         totalHaplotypeLength += contigPathLength(maximalHaplotypePath);
         for (int32_t j = 0; j < stList_length(maximalHaplotypePath); j++) {
             Segment *segment = stList_get(maximalHaplotypePath, j);
-            reportHaplotypePathStatsP(segment_get5Cap(segment), eventStrings, capCodeParameters);
-            reportHaplotypePathStatsP(segment_get3Cap(segment), eventStrings, capCodeParameters);
+            reportHaplotypePathStatsP(segment_get5Cap(segment), haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
+            reportHaplotypePathStatsP(segment_get3Cap(segment), haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
         }
     }
 
@@ -249,14 +249,14 @@ void reportSamplePathStats(Flower *flower, FILE *fileHandle,
     contigsSet = stSortedSet_construct3(compareSequences, NULL);
     haplotypesSet = stSortedSet_construct3(compareSequences, NULL);
 
-    traverseBlocks(flower, assemblyEventString, eventStrings);
+    traverseBlocks(flower, assemblyEventString, haplotypeEventStrings);
 
     stList *sequences = stSortedSet_getList(contigsSet);
     stList *haplotypes = stSortedSet_getList(haplotypesSet);
     stList_sort(blockList, compareBlocksByLength);
     stList_sort(sequences, compareSequencesByLength);
     stList_sort(maximalHaplotypePaths, compareMaximalHaplotypePaths);
-    stList *scaffoldPaths = getScaffoldPathsList(maximalHaplotypePaths, eventStrings, capCodeParameters);
+    stList *scaffoldPaths = getScaffoldPathsList(maximalHaplotypePaths, haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
     stList_sort(scaffoldPaths, compareScaffoldPaths);
 
     int32_t totalSequencesLength = 0;
@@ -346,8 +346,11 @@ int main(int argc, char *argv[]) {
 
     int64_t startTime = time(NULL);
     FILE *fileHandle = fopen(outputFile, "w");
-    stList *eventStrings = getEventStrings(hap1EventString, hap2EventString);
-    reportSamplePathStats(flower, fileHandle, assemblyEventString, eventStrings, capCodeParameters);
+
+    stList *haplotypeEventStrings = getEventStrings(hap1EventString, hap2EventString);
+    stList *contaminationEventStrings = getEventStrings(contaminationEventString, NULL);
+
+    reportSamplePathStats(flower, fileHandle, assemblyEventString, haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
     fclose(fileHandle);
     st_logInfo("Got the stats in %i seconds/\n", time(NULL) - startTime);
 

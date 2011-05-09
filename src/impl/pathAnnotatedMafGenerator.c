@@ -15,7 +15,8 @@
 stHash *segmentsToMaximalHaplotypePaths;
 stHash *maximalHaplotypePathLengths;
 stHash *maximalScaffoldPathsLengths;
-stList *eventStrings;
+stList *haplotypeEventStrings;
+stList *contaminationEventStrings;
 
 static int32_t getNumberOnPositiveStrand(Block *block) {
     Block_InstanceIterator *it = block_getInstanceIterator(block);
@@ -100,9 +101,9 @@ void getMAFBlock2(Block *block, FILE *fileHandle) {
                 int32_t insertLength;
                 int32_t deleteLength;
                 enum CapCode _5EndStatusNerd = getCapCode(segment_get5Cap(
-                        segment), eventStrings, &insertLength, &deleteLength, capCodeParameters);
+                        segment), haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters);
                 enum CapCode _3EndStatusNerd = getCapCode(segment_get3Cap(
-                        segment), eventStrings, &insertLength, &deleteLength, capCodeParameters);
+                        segment), haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters);
 
                 int32_t _5EndStatus = getSimpleCode(_5EndStatusNerd);
                 int32_t _3EndStatus = getSimpleCode(_3EndStatusNerd);
@@ -132,15 +133,16 @@ int main(int argc, char *argv[]) {
     //Get the maximal haplotype path info.
     //////////////////////////////////////////////
 
-    eventStrings = getEventStrings(hap1EventString, hap2EventString);
-    stList *maximalHaplotypePaths = getContigPaths(flower, assemblyEventString, eventStrings);
+    haplotypeEventStrings = getEventStrings(hap1EventString, hap2EventString);
+    contaminationEventStrings = getEventStrings(contaminationEventString, NULL);
+    stList *maximalHaplotypePaths = getContigPaths(flower, assemblyEventString, haplotypeEventStrings);
     segmentsToMaximalHaplotypePaths = buildSegmentToContigPathHash(
             maximalHaplotypePaths);
     maximalHaplotypePathLengths
             = buildContigPathToContigPathLengthHash(
                     maximalHaplotypePaths);
     maximalScaffoldPathsLengths = getContigPathToScaffoldPathLengthsHash(
-            maximalHaplotypePaths, eventStrings, capCodeParameters);
+            maximalHaplotypePaths, haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
 
     ///////////////////////////////////////////////////////////////////////////
     // Now print the MAFs

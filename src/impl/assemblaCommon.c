@@ -53,8 +53,12 @@ int32_t sampleNumber = 1000000;
 stList *getEventStrings(const char *hapA1EventString,
         const char *hapA2EventString) {
     stList *eventStrings = stList_construct3(0, NULL);
-    stList_append(eventStrings, stString_copy(hapA1EventString));
-    stList_append(eventStrings, stString_copy(hapA2EventString));
+    if(hapA1EventString != NULL) {
+        stList_append(eventStrings, stString_copy(hapA1EventString));
+    }
+    if(hapA2EventString != NULL) {
+        stList_append(eventStrings, stString_copy(hapA2EventString));
+    }
     return eventStrings;
 }
 

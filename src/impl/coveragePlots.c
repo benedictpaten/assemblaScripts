@@ -361,16 +361,17 @@ int main(int argc, char *argv[]) {
     // Calculate haplotype paths
     ///////////////////////////////////////////////////////////////////////////
 
-    stList *eventStrings = getEventStrings(hap1EventString, hap2EventString);
+    stList *haplotypeEventStrings = getEventStrings(hap1EventString, hap2EventString);
+    stList *contaminationEventStrings = getEventStrings(contaminationEventString, NULL);
 
-    stList *maximalHaplotypePaths = getContigPaths(flower, assemblyEventString, eventStrings);
+    stList *maximalHaplotypePaths = getContigPaths(flower, assemblyEventString, haplotypeEventStrings);
     segmentsToMaximalHaplotypePaths = buildSegmentToContigPathHash(
             maximalHaplotypePaths);
     maximalHaplotypePathLengths
             = buildContigPathToContigPathLengthHash(
                     maximalHaplotypePaths);
     maximalScaffoldPathLengths = getContigPathToScaffoldPathLengthsHash(
-            maximalHaplotypePaths, eventStrings, capCodeParameters);
+            maximalHaplotypePaths, haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
 
     ///////////////////////////////////////////////////////////////////////////
     // Calculate blocks
