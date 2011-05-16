@@ -24,6 +24,9 @@ double totalCorrectInHeterozygous = 0;
 int32_t totalErrorsInHeterozygous = 0;
 int32_t totalCallsInHeterozygous = 0;
 
+int32_t totalCorrectHap1InHeterozygous = 0;
+int32_t totalCorrectHap2InHeterozygous = 0;
+
 int32_t totalInOneHaplotypeOnly = 0;
 double totalCorrectInOneHaplotype = 0;
 int32_t totalErrorsInOneHaplotype = 0;
@@ -191,7 +194,11 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
                                                     hap2Seq[i]));
                                     totalCorrectInHeterozygous += bitsScoreFn(
                                             assemblySeq[i], hap1Seq[i]);
+                                    totalCorrectHap1InHeterozygous += bitsScoreFn(
+                                            assemblySeq[i], hap1Seq[i]);
                                     totalCorrectInHeterozygous += bitsScoreFn(
+                                            assemblySeq[i], hap2Seq[i]);
+                                    totalCorrectHap2InHeterozygous += bitsScoreFn(
                                             assemblySeq[i], hap2Seq[i]);
                                     totalErrorsInHeterozygous += (correctFn(
                                             assemblySeq[i], hap1Seq[i])
@@ -290,13 +297,18 @@ int main(int argc, char *argv[]) {
         "totalCorrectInHeterozygous=\"%f\" "
         "totalErrorsInHeterozygous=\"%i\" "
         "totalCallsInHeterozygous=\"%i\" "
+        "totalCorrectHap1InHeterozygous=\"%i\" "
+        "totalCorrectHap2InHeterozygous=\"%i\" "
         "totalInOneHaplotypeOnly=\"%i\" "
         "totalCorrectInOneHaplotypeOnly=\"%f\" "
         "totalErrorsInOneHaplotypeOnly=\"%i\" "
         "totalCallsInOneHaplotypeOnly=\"%i\" />", totalSites, totalCorrect,
             totalErrors, totalCalls, totalHeterozygous,
             totalCorrectInHeterozygous, totalErrorsInHeterozygous,
-            totalCallsInHeterozygous, totalInOneHaplotypeOnly,
+            totalCallsInHeterozygous,
+            totalCorrectHap1InHeterozygous,
+            totalCorrectHap2InHeterozygous,
+            totalInOneHaplotypeOnly,
             totalCorrectInOneHaplotype, totalErrorsInOneHaplotype,
             totalCallsInOneHaplotype);
 
