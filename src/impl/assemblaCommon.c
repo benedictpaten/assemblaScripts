@@ -30,6 +30,8 @@ char *assemblyEventString = NULL;
 char *hap1EventString = NULL;
 char *hap2EventString = NULL;
 char *contaminationEventString = NULL;
+bool treatHaplotype1AsContamination = 0;
+bool treatHaplotype2AsContamination = 0;
 
 /*
  * Optional parameter used by copy number and substitution scripts.
@@ -53,10 +55,10 @@ int32_t sampleNumber = 1000000;
 stList *getEventStrings(const char *hapA1EventString,
         const char *hapA2EventString) {
     stList *eventStrings = stList_construct3(0, NULL);
-    if(hapA1EventString != NULL) {
+    if (hapA1EventString != NULL) {
         stList_append(eventStrings, stString_copy(hapA1EventString));
     }
-    if(hapA2EventString != NULL) {
+    if (hapA2EventString != NULL) {
         stList_append(eventStrings, stString_copy(hapA2EventString));
     }
     return eventStrings;
@@ -88,11 +90,18 @@ void basicUsage(const char *programName) {
     fprintf(stderr, "-t --minimumBlockLength : Minimum block length\n");
     fprintf(stderr, "-u --ignoreFirstNBasesOfBlock : Minimum block length\n");
     fprintf(stderr, "-v --minimumIdentity : Minimum identity of the block\n");
-    fprintf(stderr,
+    fprintf(
+            stderr,
             "-w --printIndelPositions : Print out valid columns containing only one haplotype\n");
     fprintf(stderr, "-x --bucketNumber : Number of buckets\n");
     fprintf(stderr, "-y --upperLinkageBound : Upper linkage bound\n");
     fprintf(stderr, "-z --sampleNumber : Number of samples\n");
+    fprintf(
+            stderr,
+            "-A --treatHaplotype1AsContamination : For phasing, treat haplotype 1 like contamination\n");
+    fprintf(
+            stderr,
+            "-B --treatHaplotype2AsContamination : For phasing, treat haplotype 1 like contamination\n");
 }
 
 int parseBasicArguments(int argc, char *argv[], const char *programName) {
@@ -113,28 +122,38 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
     ///////////////////////////////////////////////////////////////////////////
 
     while (1) {
-        static struct option long_options[] = { { "logLevel",
-                required_argument, 0, 'a' }, { "cactusDisk", required_argument,
-                0, 'c' }, { "outputFile", required_argument, 0, 'e' }, {
-                "help", no_argument, 0, 'h' }, { "minimumNsForScaffoldGap",
-                required_argument, 0, 'm' }, { "maximumDeletionLength",
-                required_argument, 0, 'n' }, { "maximumInsertionLength",
-                required_argument, 0, 'o' }, { "assemblyEventString",
-                required_argument, 0, 'p' }, { "haplotype1EventString",
-                required_argument, 0, 'q' }, { "haplotype2EventString",
-                required_argument, 0, 'r' }, { "contaminationEventString",
-                required_argument, 0, 's' }, { "minimumBlockLength",
-                required_argument, 0, 't' }, { "ignoreFirstNBasesOfBlock",
-                required_argument, 0, 'u' }, { "minimumIdentity",
-                required_argument, 0, 'v' }, { "printIndelPositions",
-                no_argument, 0, 'w' }, { "bucketNumber", required_argument, 0,
-                'x' }, { "upperLinkageBound", required_argument, 0, 'y' }, {
-                "sampleNumber", required_argument, 0, 'z' }, { 0, 0, 0, 0 } };
+        static struct option
+                long_options[] = { { "logLevel", required_argument, 0, 'a' }, {
+                        "cactusDisk", required_argument, 0, 'c' }, {
+                        "outputFile", required_argument, 0, 'e' }, { "help",
+                        no_argument, 0, 'h' }, { "minimumNsForScaffoldGap",
+                        required_argument, 0, 'm' }, { "maximumDeletionLength",
+                        required_argument, 0, 'n' }, {
+                        "maximumInsertionLength", required_argument, 0, 'o' },
+                        { "assemblyEventString", required_argument, 0, 'p' }, {
+                                "haplotype1EventString", required_argument, 0,
+                                'q' }, { "haplotype2EventString",
+                                required_argument, 0, 'r' }, {
+                                "contaminationEventString", required_argument,
+                                0, 's' }, { "minimumBlockLength",
+                                required_argument, 0, 't' }, {
+                                "ignoreFirstNBasesOfBlock", required_argument,
+                                0, 'u' }, { "minimumIdentity",
+                                required_argument, 0, 'v' }, {
+                                "printIndelPositions", no_argument, 0, 'w' }, {
+                                "bucketNumber", required_argument, 0, 'x' },
+                        { "upperLinkageBound", required_argument, 0, 'y' }, {
+                                "sampleNumber", required_argument, 0, 'z' }, {
+                                "treatHaplotype1AsContamination",
+                                no_argument, 0, 'A' }, {
+                                "treatHaplotype2AsContamination",
+                                no_argument, 0, 'B' }, { 0, 0, 0, 0 } };
 
         int option_index = 0;
 
-        int key = getopt_long(argc, argv, "a:c:e:hm:n:o:p:q:r:s:t:u:v:wx:y:z:",
-                long_options, &option_index);
+        int key = getopt_long(argc, argv,
+                "a:c:e:hm:n:o:p:q:r:s:t:u:v:wx:y:z:AB", long_options,
+                &option_index);
 
         if (key == -1) {
             break;
@@ -225,6 +244,12 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
                             "The number of samples can not be less than 0: %i",
                             sampleNumber);
                 }
+                break;
+            case 'A':
+                treatHaplotype1AsContamination = 1;
+                break;
+            case 'B':
+                treatHaplotype2AsContamination = 1;
                 break;
             default:
                 st_errAbort("Unrecognised option %s", optarg);

@@ -142,11 +142,17 @@ void accumulateBlock(Block *block, const char *assemblyEventString, stList *even
         if (strcmp(event_getHeader(segment_getEvent(segment)), assemblyEventString) == 0) {
             stSortedSet_insert(contigsSet, sequence);
         }
-        assert(stList_length(eventStrings) == 2);
-        if (strcmp(event_getHeader(segment_getEvent(segment)), stList_get(eventStrings, 0)) == 0 ||
-                strcmp(event_getHeader(segment_getEvent(segment)), stList_get(eventStrings, 1)) == 0) {
-            stSortedSet_insert(haplotypesSet, sequence);
+        for(int32_t i=0; i<stList_length(eventStrings); i++) {
+            if(strcmp(event_getHeader(segment_getEvent(segment)), stList_get(eventStrings, i)) == 0) {
+                stSortedSet_insert(haplotypesSet, sequence);
+                break;
+            }
         }
+        //assert(stList_length(eventStrings) == 2);
+        //if (strcmp(event_getHeader(segment_getEvent(segment)), stList_get(eventStrings, 0)) == 0 ||
+        //        strcmp(event_getHeader(segment_getEvent(segment)), stList_get(eventStrings, 1)) == 0) {
+        //    stSortedSet_insert(haplotypesSet, sequence);
+        //}
     }
     block_destructInstanceIterator(instanceIt);
 }
@@ -347,8 +353,10 @@ int main(int argc, char *argv[]) {
     int64_t startTime = time(NULL);
     FILE *fileHandle = fopen(outputFile, "w");
 
-    stList *haplotypeEventStrings = getEventStrings(hap1EventString, hap2EventString);
-    stList *contaminationEventStrings = getEventStrings(contaminationEventString, NULL);
+    assert(!(treatHaplotype1AsContamination && treatHaplotype2AsContamination));
+
+    stList *haplotypeEventStrings = getEventStrings(treatHaplotype1AsContamination ? NULL : hap1EventString, treatHaplotype2AsContamination ? NULL : hap2EventString);
+    stList *contaminationEventStrings = getEventStrings(contaminationEventString, treatHaplotype1AsContamination ? hap1EventString : (treatHaplotype2AsContamination ? hap2EventString : NULL));
 
     reportSamplePathStats(flower, fileHandle, assemblyEventString, haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
     fclose(fileHandle);

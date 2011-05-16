@@ -23,6 +23,8 @@ extern char *assemblyEventString;
 extern char *hap1EventString;
 extern char *hap2EventString;
 extern char *contaminationEventString;
+extern bool treatHaplotype1AsContamination;
+extern bool treatHaplotype2AsContamination;
 
 /*
  * Optional parameter used by copy number and substitution scripts.

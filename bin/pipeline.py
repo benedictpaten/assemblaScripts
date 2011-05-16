@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 """Script runs cactus to compare a bunch of assemblies against a set of two haplotypes and 
 a set of contamination sequences.
 """
@@ -171,6 +170,14 @@ class MakeContigPathStats(MakeStats1):
         self.runScript("pathStats", outputFile, "")
         self.addChildTarget(MakeCoveragePlots(self.outputDir, self.alignment, self.options))
         
+        outputFile = os.path.join(self.outputDir, "pathStats_hap1Phasing.xml")
+        self.runScript("pathStats", outputFile, "--treatHaplotype2AsContamination")
+        self.addChildTarget(MakeCoveragePlots(self.outputDir, self.alignment, self.options))
+        
+        outputFile = os.path.join(self.outputDir, "pathStats_hap2Phasing.xml")
+        self.runScript("pathStats", outputFile, "--treatHaplotype1AsContamination")
+        self.addChildTarget(MakeCoveragePlots(self.outputDir, self.alignment, self.options))
+        
 class MakeCoveragePlots(MakeStats1):
     """Makes coverage plots.
     """
@@ -216,7 +223,7 @@ def main():
     ##########################################
     #Construct the arguments.
     ##########################################
-    
+
     parser = OptionParser()
  
     parser.add_option("--haplotypeSequences", dest="haplotypeSequences")
@@ -231,10 +238,10 @@ def main():
     parser.add_option("--contaminationEventString", dest="contaminationEventString")
     
     Stack.addJobTreeOptions(parser)
-    
+
     options, args = parser.parse_args()
     setLoggingFromOptions(options)
-    
+
     if len(args) != 0:
         raise RuntimeError("Unrecognised input arguments: %s" % " ".join(args))
 
