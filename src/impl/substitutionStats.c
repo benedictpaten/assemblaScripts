@@ -30,6 +30,7 @@ int32_t totalErrorsInOneHaplotype = 0;
 int32_t totalCallsInOneHaplotype = 0;
 
 stList *indelPositions = NULL;
+stList *hetPositions = NULL;
 
 typedef struct _segmentHolder {
     Segment *segment;
@@ -41,6 +42,40 @@ SegmentHolder *segmentHolder_construct(Segment *segment, int32_t offset) {
     segmentHolder->segment = segment;
     segmentHolder->offset = offset;
     return segmentHolder;
+}
+
+void printPositions(stList *positions, const char *substitutionType, FILE *fileHandle) {
+    for (int32_t i = 0; i < stList_length(positions); i++) {
+        SegmentHolder *segmentHolder = stList_get(positions, i);
+        int32_t j = segment_getStart(segmentHolder->segment);
+        if (segment_getStrand(segmentHolder->segment)) {
+            j += segmentHolder->offset;
+            assert(
+                    cap_getCoordinate(segment_get5Cap(segmentHolder->segment))
+                            == segment_getStart(segmentHolder->segment));
+            assert(
+                    segment_getStart(segmentHolder->segment)
+                            + segment_getLength(segmentHolder->segment) - 1
+                            == cap_getCoordinate(
+                                    segment_get3Cap(segmentHolder->segment)));
+        } else {
+            j -= segmentHolder->offset;
+            assert(
+                    segment_getStart(segmentHolder->segment)
+                            - segment_getLength(segmentHolder->segment) + 1
+                            == cap_getCoordinate(
+                                    segment_get3Cap(segmentHolder->segment)));
+        }
+
+        fprintf(
+                fileHandle,
+                "%s: %s_%i %i\n",
+                substitutionType,
+                event_getHeader(segment_getEvent(segmentHolder->segment)),
+                sequence_getLength(segment_getSequence(segmentHolder->segment)),
+                j);
+        getMAFBlock(segment_getBlock(segmentHolder->segment), fileHandle);
+    }
 }
 
 static void getSnpStats(Block *block, FILE *fileHandle) {
@@ -142,17 +177,18 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
                             if (toupper(hap1Seq[i]) == toupper(hap2Seq[i])) {
                                 totalSites++;
                                 if (assemblySeq != NULL) {
-                                    totalCorrect += bitsScoreFn(
-                                            assemblySeq[i], hap1Seq[i]);
-                                    totalErrors += correctFn(
-                                            assemblySeq[i], hap1Seq[i]) ? 0 : 1;
+                                    totalCorrect += bitsScoreFn(assemblySeq[i],
+                                            hap1Seq[i]);
+                                    totalErrors += correctFn(assemblySeq[i],
+                                            hap1Seq[i]) ? 0 : 1;
                                     totalCalls++;
                                 }
                             } else {
                                 totalHeterozygous++;
                                 if (assemblySeq != NULL) {
-                                    assert(toupper(hap1Seq[i]) != toupper(
-                                            hap2Seq[i]));
+                                    assert(
+                                            toupper(hap1Seq[i]) != toupper(
+                                                    hap2Seq[i]));
                                     totalCorrectInHeterozygous += bitsScoreFn(
                                             assemblySeq[i], hap1Seq[i]);
                                     totalCorrectInHeterozygous += bitsScoreFn(
@@ -162,6 +198,14 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
                                             || correctFn(assemblySeq[i],
                                                     hap2Seq[i])) ? 0 : 1;
                                     totalCallsInHeterozygous++;
+                                    if (!(correctFn(assemblySeq[i], hap1Seq[i])
+                                            || correctFn(assemblySeq[i],
+                                                    hap2Seq[i]))) {
+                                        stList_append(
+                                                hetPositions,
+                                                segmentHolder_construct(
+                                                        hap1Segment, i));
+                                    }
                                 }
                             }
                         } else {
@@ -173,7 +217,8 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
                                         assemblySeq[i], hap1Seq[i]) ? 0 : 1;
                                 totalCallsInOneHaplotype++;
                                 if (!correctFn(assemblySeq[i], hap1Seq[i])) {
-                                    stList_append(indelPositions,
+                                    stList_append(
+                                            indelPositions,
                                             segmentHolder_construct(
                                                     hap1Segment, i));
                                 }
@@ -189,7 +234,8 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
                                         assemblySeq[i], hap2Seq[i]) ? 0 : 1;
                                 totalCallsInOneHaplotype++;
                                 if (!correctFn(assemblySeq[i], hap2Seq[i])) {
-                                    stList_append(indelPositions,
+                                    stList_append(
+                                            indelPositions,
                                             segmentHolder_construct(
                                                     hap2Segment, i));
                                 }
@@ -227,6 +273,7 @@ int main(int argc, char *argv[]) {
     ///////////////////////////////////////////////////////////////////////////
 
     indelPositions = stList_construct3(0, NULL);
+    hetPositions = stList_construct3(0, NULL);
     FILE *fileHandle = fopen(outputFile, "w");
     getMAFsReferenceOrdered(flower, fileHandle, getSnpStats);
 
@@ -246,42 +293,21 @@ int main(int argc, char *argv[]) {
         "totalInOneHaplotypeOnly=\"%i\" "
         "totalCorrectInOneHaplotypeOnly=\"%f\" "
         "totalErrorsInOneHaplotypeOnly=\"%i\" "
-        "totalCallsInOneHaplotypeOnly=\"%i\" />", totalSites,
-            totalCorrect, totalErrors,
-            totalCalls, totalHeterozygous,
+        "totalCallsInOneHaplotypeOnly=\"%i\" />", totalSites, totalCorrect,
+            totalErrors, totalCalls, totalHeterozygous,
             totalCorrectInHeterozygous, totalErrorsInHeterozygous,
             totalCallsInHeterozygous, totalInOneHaplotypeOnly,
             totalCorrectInOneHaplotype, totalErrorsInOneHaplotype,
             totalCallsInOneHaplotype);
 
     if (printIndelPositions) {
-        for (int32_t i = 0; i < stList_length(indelPositions); i++) {
-            SegmentHolder *segmentHolder = stList_get(indelPositions, i);
-            int32_t j = segment_getStart(segmentHolder->segment);
-            if (segment_getStrand(segmentHolder->segment)) {
-                j += segmentHolder->offset;
-                assert(cap_getCoordinate(
-                        segment_get5Cap(segmentHolder->segment))
-                        == segment_getStart(segmentHolder->segment));
-                assert(segment_getStart(segmentHolder->segment)
-                        + segment_getLength(segmentHolder->segment) - 1
-                        == cap_getCoordinate(segment_get3Cap(
-                                segmentHolder->segment)));
-            } else {
-                j -= segmentHolder->offset;
-                assert(segment_getStart(segmentHolder->segment)
-                        - segment_getLength(segmentHolder->segment) + 1
-                        == cap_getCoordinate(segment_get3Cap(
-                                segmentHolder->segment)));
-            }
-
-            fprintf(fileHandle, "INDEL-SUBSTITUTION: %s_%i %i\n",
-                    event_getHeader(segment_getEvent(segmentHolder->segment)),
-                    sequence_getLength(segment_getSequence(
-                            segmentHolder->segment)), j);
-            getMAFBlock(segment_getBlock(segmentHolder->segment), fileHandle);
-        }
+        printPositions(indelPositions, "INDEL_SUBSTITUTION", fileHandle);
     }
+
+    if (printHetPositions) {
+        printPositions(hetPositions, "HET_SUBSTITUTION", fileHandle);
+    }
+
     st_logInfo("Finished writing out the stats.\n");
     fclose(fileHandle);
 

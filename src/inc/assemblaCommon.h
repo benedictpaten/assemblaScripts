@@ -37,6 +37,7 @@ extern int32_t minimumBlockLength;
 extern int32_t ignoreFirstNBasesOfBlock;
 extern int32_t minimumIndentity;
 extern bool printIndelPositions;
+extern bool printHetPositions;
 
 /*
  * For the linkage script.

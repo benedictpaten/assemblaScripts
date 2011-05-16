@@ -195,6 +195,9 @@ class MakeSubstitutionStats(MakeStats1):
         outputFile = os.path.join(self.outputDir, "substitutionStats_1000_98_5_indel_positions.xml")
         self.runScript("substitutionStats", outputFile, "--ignoreFirstNBases 5 --minimumBlockLength 1000 --minimumIdentity 98 --printIndelPositions")
         
+        outputFile = os.path.join(self.outputDir, "substitutionStats_1000_98_5_het_positions.xml")
+        self.runScript("substitutionStats", outputFile, "--ignoreFirstNBases 5 --minimumBlockLength 1000 --minimumIdentity 98 --printHetPositions")
+        
         outputFile = os.path.join(self.outputDir, "substitutionStats_0_0_0.xml")
         self.runScript("substitutionStats", outputFile, "--ignoreFirstNBases 0 --minimumBlockLength 0")
         

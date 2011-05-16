@@ -44,6 +44,7 @@ int32_t minimumBlockLength = 0;
 int32_t ignoreFirstNBasesOfBlock = 0;
 int32_t minimumIndentity = 0;
 bool printIndelPositions = 0;
+bool printHetPositions = 0;
 
 /*
  * For the linkage script.
@@ -102,6 +103,8 @@ void basicUsage(const char *programName) {
     fprintf(
             stderr,
             "-B --treatHaplotype2AsContamination : For phasing, treat haplotype 1 like contamination\n");
+    fprintf(stderr,
+            "-C --printHetPositions : Print out valid heterozygous columns\n");
 }
 
 int parseBasicArguments(int argc, char *argv[], const char *programName) {
@@ -122,37 +125,31 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
     ///////////////////////////////////////////////////////////////////////////
 
     while (1) {
-        static struct option
-                long_options[] = { { "logLevel", required_argument, 0, 'a' }, {
-                        "cactusDisk", required_argument, 0, 'c' }, {
-                        "outputFile", required_argument, 0, 'e' }, { "help",
-                        no_argument, 0, 'h' }, { "minimumNsForScaffoldGap",
-                        required_argument, 0, 'm' }, { "maximumDeletionLength",
-                        required_argument, 0, 'n' }, {
-                        "maximumInsertionLength", required_argument, 0, 'o' },
-                        { "assemblyEventString", required_argument, 0, 'p' }, {
-                                "haplotype1EventString", required_argument, 0,
-                                'q' }, { "haplotype2EventString",
-                                required_argument, 0, 'r' }, {
-                                "contaminationEventString", required_argument,
-                                0, 's' }, { "minimumBlockLength",
-                                required_argument, 0, 't' }, {
-                                "ignoreFirstNBasesOfBlock", required_argument,
-                                0, 'u' }, { "minimumIdentity",
-                                required_argument, 0, 'v' }, {
-                                "printIndelPositions", no_argument, 0, 'w' }, {
-                                "bucketNumber", required_argument, 0, 'x' },
-                        { "upperLinkageBound", required_argument, 0, 'y' }, {
-                                "sampleNumber", required_argument, 0, 'z' }, {
-                                "treatHaplotype1AsContamination",
-                                no_argument, 0, 'A' }, {
-                                "treatHaplotype2AsContamination",
-                                no_argument, 0, 'B' }, { 0, 0, 0, 0 } };
+        static struct option long_options[] = { { "logLevel",
+                required_argument, 0, 'a' }, { "cactusDisk", required_argument,
+                0, 'c' }, { "outputFile", required_argument, 0, 'e' }, {
+                "help", no_argument, 0, 'h' }, { "minimumNsForScaffoldGap",
+                required_argument, 0, 'm' }, { "maximumDeletionLength",
+                required_argument, 0, 'n' }, { "maximumInsertionLength",
+                required_argument, 0, 'o' }, { "assemblyEventString",
+                required_argument, 0, 'p' }, { "haplotype1EventString",
+                required_argument, 0, 'q' }, { "haplotype2EventString",
+                required_argument, 0, 'r' }, { "contaminationEventString",
+                required_argument, 0, 's' }, { "minimumBlockLength",
+                required_argument, 0, 't' }, { "ignoreFirstNBasesOfBlock",
+                required_argument, 0, 'u' }, { "minimumIdentity",
+                required_argument, 0, 'v' }, { "printIndelPositions",
+                no_argument, 0, 'w' }, { "bucketNumber", required_argument, 0,
+                'x' }, { "upperLinkageBound", required_argument, 0, 'y' }, {
+                "sampleNumber", required_argument, 0, 'z' }, {
+                "treatHaplotype1AsContamination", no_argument, 0, 'A' }, {
+                "treatHaplotype2AsContamination", no_argument, 0, 'B' }, {
+                "printHetPositions", no_argument, 0, 'C' }, { 0, 0, 0, 0 } };
 
         int option_index = 0;
 
         int key = getopt_long(argc, argv,
-                "a:c:e:hm:n:o:p:q:r:s:t:u:v:wx:y:z:AB", long_options,
+                "a:c:e:hm:n:o:p:q:r:s:t:u:v:wx:y:z:ABC", long_options,
                 &option_index);
 
         if (key == -1) {
@@ -250,6 +247,9 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
                 break;
             case 'B':
                 treatHaplotype2AsContamination = 1;
+                break;
+            case 'C':
+                printHetPositions = 1;
                 break;
             default:
                 st_errAbort("Unrecognised option %s", optarg);
