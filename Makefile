@@ -28,7 +28,8 @@ testLittle:
 testStatic:
 	cd tests/static && make all
 
-run: scaffolds contigs static
+run: scaffolds contigs 
+#static
 
 scaffolds:
 	cd assemblathon1/scaffolds && make all
