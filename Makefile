@@ -8,9 +8,9 @@ clean:
 	cd tests/big && make clean
 	cd tests/little && make clean
 	cd tests/static && make clean
-	cd assemblathon1/scaffolds && make clean
-	cd assemblathon1/contigs && make clean
-	cd assemblathon1/static && make clean
+	#cd assemblathon1/scaffolds && make clean
+	#cd assemblathon1/contigs && make clean
+	#cd assemblathon1/static && make clean
 
 cleanTest:
 	cd tests/big && make clean
