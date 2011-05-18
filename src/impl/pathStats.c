@@ -274,7 +274,7 @@ void reportSamplePathStats(Flower *flower, FILE *fileHandle,
     for (int32_t i = 0; i < stList_length(haplotypes); i++) {
         averageHaplotypeLength += sequence_getLength(stList_get(haplotypes, i));
     }
-    averageHaplotypeLength /= 2;
+    averageHaplotypeLength /= stList_length(haplotypeEventStrings);
 
     int32_t totalBlockNumber = stList_length(blockList);
     int32_t blockNG50 = getN50(averageHaplotypeLength, blockList, (int32_t(*)(const void *)) block_getLength);
