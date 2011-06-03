@@ -33,14 +33,16 @@ int main(int argc, char *argv[]) {
     stList *eventStrings = getEventStrings(hap1EventString, hap2EventString);
     stSortedSet *sequences = getMetaSequencesForEvents(flower, eventStrings);
     stSortedSetIterator *it = stSortedSet_getIterator(sequences);
+    stSortedSet *sortedSegments = getOrderedSegments(flower);
     MetaSequence *metaSequence;
     while ((metaSequence = stSortedSet_getNext(it)) != NULL) {
         samplePoints(flower, metaSequence, assemblyEventString,
                 sampleNumber, correct, samples,
-                bucketNumber, bucketSize);
+                bucketNumber, bucketSize, sortedSegments);
     }
     stSortedSet_destructIterator(it);
     stSortedSet_destruct(sequences);
+    stSortedSet_destruct(sortedSegments);
 
     ///////////////////////////////////////////////////////////////////////////
     // Write it out.
