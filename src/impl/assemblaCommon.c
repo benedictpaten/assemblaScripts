@@ -261,12 +261,7 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
     //Set up logging
     //////////////////////////////////////////////
 
-    if (logLevelString != NULL && strcmp(logLevelString, "INFO") == 0) {
-        st_setLogLevel(ST_LOGGING_INFO);
-    }
-    if (logLevelString != NULL && strcmp(logLevelString, "DEBUG") == 0) {
-        st_setLogLevel(ST_LOGGING_DEBUG);
-    }
+    st_setLogLevelFromString(logLevelString);
 
     if (outputFile == NULL) {
         st_errAbort("The output file was not specified");

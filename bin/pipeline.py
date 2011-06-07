@@ -13,8 +13,8 @@ from optparse import OptionParser
 from jobTree.scriptTree.target import Target 
 from jobTree.scriptTree.stack import Stack
 
-from jobTree.src.bioio import logger
-from jobTree.src.bioio import setLoggingFromOptions
+from sonLib.bioio import logger
+from sonLib.bioio import setLoggingFromOptions
 
 from cactus.shared.config import CactusWorkflowExperiment
 from cactus.shared.common import runCactusWorkflow
