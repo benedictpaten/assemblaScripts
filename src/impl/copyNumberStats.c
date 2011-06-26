@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     setOfPairs = stHash_construct3((uint32_t(*)(const void *)) stIntTuple_hashKey,
             (int(*)(const void *, const void *)) stIntTuple_equalsFn, (void(*)(void *)) stIntTuple_destruct, free);
     //Pass over the blocks.
-    getMAFsReferenceOrdered(flower, fileHandle, getMAFBlock2);
+    getMAFs(flower, fileHandle, getMAFBlock2);
     //Now calculate the linkage stats
     stList *copyNumbers = stHash_getKeys(setOfPairs);
     stList_sort(copyNumbers, (int(*)(const void *, const void *)) stIntTuple_cmpFn);

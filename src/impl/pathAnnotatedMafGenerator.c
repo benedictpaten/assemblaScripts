@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
     int64_t startTime = time(NULL);
     FILE *fileHandle = fopen(outputFile, "w");
     makeMAFHeader(flower, fileHandle);
-    getMAFsReferenceOrdered(flower, fileHandle, getMAFBlock2);
+    getMAFsReferenceOrdered("reference", flower, fileHandle, getMAFBlock2);
 
     fclose(fileHandle);
     st_logInfo("Got the mafs in %i seconds/\n", time(NULL) - startTime);

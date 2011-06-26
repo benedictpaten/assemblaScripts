@@ -263,7 +263,7 @@ int main(int argc, char *argv[]) {
     indelPositions = stList_construct3(0, NULL);
     hetPositions = stList_construct3(0, NULL);
     FILE *fileHandle = fopen(outputFile, "w");
-    getMAFsReferenceOrdered(flower, fileHandle, getSnpStats);
+    getMAFs(flower, fileHandle, getSnpStats);
 
     ///////////////////////////////////////////////////////////////////////////
     // Print outputs
