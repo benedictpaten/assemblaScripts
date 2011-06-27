@@ -30,8 +30,6 @@ static void getMAFBlock2(Block *block, FILE *fileHandle) {
                 hapA1Number++;
             } else if (strcmp(segmentEvent, hap2EventString) == 0) {
                 hapA2Number++;
-            } else {
-                assert(strcmp(segmentEvent, contaminationEventString) == 0);
             }
         }
         block_destructInstanceIterator(instanceIt);
