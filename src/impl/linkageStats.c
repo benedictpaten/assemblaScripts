@@ -24,10 +24,12 @@ int main(int argc, char *argv[]) {
 
     double bucketSize = bucketNumber / log10(upperLinkageBound);
     int32_t *correct = st_malloc(sizeof(int32_t) * bucketNumber);
+    int32_t *aligned = st_malloc(sizeof(int32_t) * bucketNumber);
     int32_t *samples = st_malloc(sizeof(int32_t) * bucketNumber);
     for (int32_t i = 0; i < bucketNumber; i++) {
-        correct[i] = 0.0;
-        samples[i] = 0.0;
+        correct[i] = 0;
+        aligned[i] = 0;
+        samples[i] = 0;
     }
 
     stList *eventStrings = getEventStrings(hap1EventString, hap2EventString);
@@ -37,7 +39,7 @@ int main(int argc, char *argv[]) {
     MetaSequence *metaSequence;
     while ((metaSequence = stSortedSet_getNext(it)) != NULL) {
         samplePoints(flower, metaSequence, assemblyEventString,
-                sampleNumber, correct, samples,
+                sampleNumber, correct, aligned, samples,
                 bucketNumber, bucketSize, sortedSegments);
     }
     stSortedSet_destructIterator(it);
