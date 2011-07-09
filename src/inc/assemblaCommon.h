@@ -46,6 +46,11 @@ extern int32_t bucketNumber;
 extern int32_t upperLinkageBound;
 extern int32_t sampleNumber;
 
+/*
+ * For the path intervals script
+ */
+extern bool reportContigPathIntervals;
+
 stList *getEventStrings(const char *hapA1EventString, const char *hapA2EventString);
 
 void basicUsage(const char *programName);

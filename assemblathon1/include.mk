@@ -5,3 +5,5 @@ hap1EventString=hapA1
 hap2EventString=hapA2
 assemblyEventString=assembly
 contaminationEventString=ecoli
+featureBedFiles=${dataPath}/assemblathon1/simulatedHaplotypes/bedsA1/* ${dataPath}/assemblathon1/simulatedHaplotypes/bedsA2/*
+geneBedFiles=${dataPath}/assemblathon1/simulatedHaplotypes/*/*TRANSCRIPTS* ${dataPath}/assemblathon1/simulatedHaplotypes/*/*CDS* 

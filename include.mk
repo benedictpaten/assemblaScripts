@@ -16,7 +16,7 @@ minimumNsForScaffoldGap=15
 pipeline :
 	rm -rf ./jobTree
 	#Running pipeline to build comparisons
-	python ${binPath}/pipeline.py --assemblyEventString ${assemblyEventString} --haplotype1EventString ${hap1EventString} --haplotype2EventString ${hap2EventString} --contaminationEventString ${contaminationEventString} --haplotypeSequences '${haplotypeSequences}' --newickTree '${newickTree}' --assembliesDir ${assembliesDir} --outputDir ${outputDir} --configFile ${configFile} --minimumNsForScaffoldGap ${minimumNsForScaffoldGap} --jobTree ./jobTree ${jobTreeFlags}
+	python ${binPath}/pipeline.py --geneBedFiles '${geneBedFiles}' --featureBedFiles '${featureBedFiles}' --assemblyEventString ${assemblyEventString} --haplotype1EventString ${hap1EventString} --haplotype2EventString ${hap2EventString} --contaminationEventString ${contaminationEventString} --haplotypeSequences '${haplotypeSequences}' --newickTree '${newickTree}' --assembliesDir ${assembliesDir} --outputDir ${outputDir} --configFile ${configFile} --minimumNsForScaffoldGap ${minimumNsForScaffoldGap} --jobTree ./jobTree ${jobTreeFlags}
 	jobTreeStatus --jobTree ./jobTree --failIfNotComplete
 	rm -rf ./jobTree
 	

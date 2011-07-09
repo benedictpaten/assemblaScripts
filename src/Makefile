@@ -14,7 +14,7 @@ commonSources = impl/assemblaCommon.c
 
 extraLibs=${assemblaLibPath}/assemblaLib.a ${cactusToolsLibPath}/cactusMafs.a ${cactusToolsLibPath}/cactusTreeStats.a ${cactusLibPath}/cactusReference.a ${cactusLibPath}/cactusLib.a
 
-programs = coveragePlots substitutionStats pathAnnotatedMafGenerator pathStats copyNumberStats linkageStats
+programs = coveragePlots substitutionStats pathAnnotatedMafGenerator pathStats copyNumberStats linkageStats pathIntervals
 
 all : ${programs:%=${binPath}/%}
 

@@ -221,6 +221,29 @@ class MakeLinkageStats(MakeStats1):
     def run(self):
         outputFile = os.path.join(self.outputDir, "linkageStats.xml")
         self.runScript("linkageStats", outputFile, "--bucketNumber 2000 --sampleNumber 100000000")
+        self.addChildTarget(MakeContigAndScaffoldPathIntervals(self.outputDir, self.alignment, self.options))
+        
+class MakeContigAndScaffoldPathIntervals(MakeStats1):
+    """Make linkage stats.
+    """
+    def run(self):
+        #Get contig and scaffold paths
+        contigPathOutputFile = os.path.join(self.outputDir, "contigPaths.bed")
+        self.runScript("pathIntervals", contigPathOutputFile, "--reportContigPathIntervals")
+        scaffoldPathOutputFile = os.path.join(self.outputDir, "scaffoldPaths.bed")
+        self.runScript("pathIntervals", scaffoldPathOutputFile, "")
+        #Get bed containments
+        contigPathOverlapFile = os.path.join(self.outputDir, "contigPathsFeatureOverlap.xml")
+        binPath = os.path.join(getRootPathString(), "bin")
+        system("python %s/bedFileIntersection.py %s %s %s" % (binPath, contigPathOutputFile, contigPathOverlapFile, self.options.featureBedFiles))
+        scaffoldPathOverlapFile = os.path.join(self.outputDir, "scaffoldPathsFeatureOverlap.xml")
+        system("python %s/bedFileIntersection.py %s %s %s" % (binPath, scaffoldPathOutputFile, scaffoldPathOverlapFile, self.options.featureBedFiles))
+        #Get gene containment
+        contigPathGeneOverlapFile = os.path.join(self.outputDir, "contigPathsFeatureGeneOverlap.xml")
+        binPath = os.path.join(getRootPathString(), "bin")
+        system("python %s/bedFileGeneIntersection.py %s %s %s" % (binPath, contigPathOutputFile, contigPathOverlapFile, self.options.geneBedFiles))
+        scaffoldPathGeneOverlapFile = os.path.join(self.outputDir, "scaffoldPathsFeatureGeneOverlap.xml")
+        system("python %s/bedFileGeneIntersection.py %s %s %s" % (binPath, scaffoldPathGeneOutputFile, scaffoldPathOverlapFile, self.options.geneBedFiles))
     
 def main():
     ##########################################
@@ -239,6 +262,8 @@ def main():
     parser.add_option("--haplotype1EventString", dest="haplotype1EventString")
     parser.add_option("--haplotype2EventString", dest="haplotype2EventString")
     parser.add_option("--contaminationEventString", dest="contaminationEventString")
+    parser.add_option("--featureBedFiles", dest="featureBedFiles")
+    parser.add_option("--geneBedFiles", dest="geneBedFiles")
     
     Stack.addJobTreeOptions(parser)
 
