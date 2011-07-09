@@ -5,5 +5,5 @@ hap1EventString=hapA1
 hap2EventString=hapA2
 assemblyEventString=assembly
 contaminationEventString=ecoli
-featureBedFiles=${dataPath}/tests/little/beds/*
+featureBedFiles=${dataPath}/tests/little/beds/test1.bed ${dataPath}/tests/little/beds/test2.bed
 geneBedFiles=${dataPath}/tests/little/beds/test1.bed
