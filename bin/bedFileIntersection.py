@@ -20,7 +20,7 @@ pathIntervals = parseBedFile(sys.argv[1])
 stats = ET.Element("stats", attrib={ "msaFile":sys.argv[1]})
 for bedFile in sys.argv[3:]:
     samples, complete = getContainment(pathIntervals, parseBedFile(bedFile))
-    ET.SubElement(stats, "intervals", attrib={ "complete":str(complete), "samples":str(samples) })
+    ET.SubElement(stats, "intervals", attrib={ "featureFile":bedFile, "complete":str(complete), "samples":str(samples) })
 
 fileHandle = open(sys.argv[2], "w")
 ET.ElementTree(stats).write(fileHandle)

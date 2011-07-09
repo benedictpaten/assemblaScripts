@@ -240,10 +240,9 @@ class MakeContigAndScaffoldPathIntervals(MakeStats1):
         system("python %s/bedFileIntersection.py %s %s %s" % (binPath, scaffoldPathOutputFile, scaffoldPathOverlapFile, self.options.featureBedFiles))
         #Get gene containment
         contigPathGeneOverlapFile = os.path.join(self.outputDir, "contigPathsFeatureGeneOverlap.xml")
-        binPath = os.path.join(getRootPathString(), "bin")
-        system("python %s/bedFileGeneIntersection.py %s %s %s" % (binPath, contigPathOutputFile, contigPathOverlapFile, self.options.geneBedFiles))
+        system("python %s/bedFileGeneIntersection.py %s %s %s" % (binPath, contigPathOutputFile, contigPathGeneOverlapFile, self.options.geneBedFiles))
         scaffoldPathGeneOverlapFile = os.path.join(self.outputDir, "scaffoldPathsFeatureGeneOverlap.xml")
-        system("python %s/bedFileGeneIntersection.py %s %s %s" % (binPath, scaffoldPathGeneOutputFile, scaffoldPathOverlapFile, self.options.geneBedFiles))
+        system("python %s/bedFileGeneIntersection.py %s %s %s" % (binPath, scaffoldPathOutputFile, scaffoldPathGeneOverlapFile, self.options.geneBedFiles))
     
 def main():
     ##########################################
