@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     //Parse the inputs
     //////////////////////////////////////////////
 
-    parseBasicArguments(argc, argv, "linkageStats");
+    parseBasicArguments(argc, argv, "contiguityStats");
 
     ///////////////////////////////////////////////////////////////////////////
     // Calculate and print to file a crap load of numbers.
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     while ((metaSequence = stSortedSet_getNext(it)) != NULL) {
         samplePoints(flower, metaSequence, assemblyEventString,
                 sampleNumber, correct, aligned, samples,
-                bucketNumber, bucketSize, sortedSegments);
+                bucketNumber, bucketSize, sortedSegments, 1);
     }
     stSortedSet_destructIterator(it);
     stSortedSet_destruct(sequences);
