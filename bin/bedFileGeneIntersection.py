@@ -1,11 +1,17 @@
 import sys
+import bisect
 import xml.etree.ElementTree as ET
+from bedFileIntersection import parseBedFile, getContainer
 
-def parseBedFile(file, fields=3):
-    return [ line.split()[:fields] for line in open(file, 'r').readlines() ]
+def parseGeneBedFile(file):
+    fn = lambda (seqName, start, end, gene) : (seqName, int(start), int(end), gene)
+    return [ fn(line.split()[:4]) for line in open(file, 'r').readlines() ]
 
 def getContainment(pathIntervals, featureIntervals):
-    for seqName2, start2, end2 in pathIntervals:
+    seqName, start, end = featureIntervals[0]
+    i = getContainer(seqName, start, end)
+    if i != None:
+        seqName2, start2, end2 = i
         for seqName, start, end, in featureIntervals:
             if seqName != seqName2 or int(start) < int(start2) or int(end) > int(end2):
                 break
@@ -19,7 +25,7 @@ for bedFile in sys.argv[3:]:
     samples = 0
     complete = 0
     genesToIntervals = {}
-    for seqName, start, end, gene in parseBedFile(bedFile, fields=4):
+    for seqName, start, end, gene in parseGeneBedFile(bedFile):
         if not genesToIntervals.has_key(gene):
              genesToIntervals[gene] = []
         genesToIntervals[gene].append((seqName, start, end))
