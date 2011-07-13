@@ -8,7 +8,9 @@ def parseBedFile(file):
 
 def getContainer(seqName, start, end, pathIntervals):
     i = bisect.bisect_left(pathIntervals, (seqName, start, -1))
-    for i in xrange(i-1, len(pathIntervals)):
+    if i > 0:
+        i -= 1
+    for i in xrange(i, len(pathIntervals)):
         seqName2, start2, end2 = pathIntervals[i]
         if seqName < seqName2 or start < start2:
             return None
@@ -20,11 +22,12 @@ def getContainer(seqName, start, end, pathIntervals):
         
 def getContainment(pathIntervals, featureIntervals):
     samples = 0
-    complete = 0
+    complete = []
     for seqName, start, end in featureIntervals:
         samples += 1
-        if getContainer(seqName, start, end, pathIntervals) != None:
-            complete += 1
+        i = getContainer(seqName, start, end, pathIntervals)
+        if i != None:
+            complete.append("_".join([ str(j) for j in i + (seqName,start,end) ]))
     return samples, complete
 
 pathIntervals = parseBedFile(sys.argv[1])
@@ -32,7 +35,8 @@ pathIntervals.sort()
 stats = ET.Element("stats", attrib={ "msaFile":sys.argv[1]})
 for bedFile in sys.argv[3:]:
     samples, complete = getContainment(pathIntervals, parseBedFile(bedFile))
-    ET.SubElement(stats, "intervals", attrib={ "featureFile":bedFile, "complete":str(complete), "samples":str(samples) })
+    tag = ET.SubElement(stats, "intervals", attrib={ "featureFile":bedFile, "complete":str(len(complete)), "samples":str(samples) })
+    tag.text = " ".join(complete)
 
 fileHandle = open(sys.argv[2], "w")
 ET.ElementTree(stats).write(fileHandle)
