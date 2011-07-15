@@ -30,9 +30,8 @@ int main(int argc, char *argv[]) {
     for(int32_t i=0; i<stList_length(haplotypeEventStrings); i++) {
         const char *hapEventString = stList_get(haplotypeEventStrings, i);
         st_logInfo("Getting contig paths for haplotype: %s", hapEventString);
-        stList *hapIntervals;
         stList *contigPaths = getContigPaths(flower, hapEventString, assemblyEventStringInList);
-        hapIntervals = getSplitContigPathIntervals(flower, contigPaths, hapEventString,
+        stList *hapIntervals = getSplitContigPathIntervals(flower, contigPaths, hapEventString,
                 assemblyEventStringInList);
         stList_destruct(contigPaths);
         st_logInfo("Getting contig paths\n");

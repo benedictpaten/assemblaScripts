@@ -23,19 +23,24 @@ def getContainer(seqName, start, end, pathIntervals):
 def getContainment(pathIntervals, featureIntervals):
     samples = 0
     complete = []
+    totalLength = 0
+    totalContainment = 0
     for seqName, start, end in featureIntervals:
         samples += 1
         i = getContainer(seqName, start, end, pathIntervals)
+        length = abs(end - start + 1)
+        totalLength += length
         if i != None:
+            totalContainment += length
             complete.append("_".join([ str(j) for j in i + (seqName,start,end) ]))
-    return samples, complete
+    return samples, complete, totalLength, totalContainment
 
 pathIntervals = parseBedFile(sys.argv[1])
 pathIntervals.sort()
 stats = ET.Element("stats", attrib={ "msaFile":sys.argv[1]})
 for bedFile in sys.argv[3:]:
-    samples, complete = getContainment(pathIntervals, parseBedFile(bedFile))
-    tag = ET.SubElement(stats, "intervals", attrib={ "featureFile":bedFile, "complete":str(len(complete)), "samples":str(samples) })
+    samples, complete, totalLength, totalContainment = getContainment(pathIntervals, parseBedFile(bedFile))
+    tag = ET.SubElement(stats, "intervals", attrib={ "featureFile":bedFile, "complete":str(len(complete)), "samples":str(samples), "baseLength":str(totalLength), "totalComplete":str(totalContainment) })
     tag.text = " ".join(complete)
 
 fileHandle = open(sys.argv[2], "w")

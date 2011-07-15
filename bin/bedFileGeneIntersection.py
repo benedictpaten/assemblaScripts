@@ -28,6 +28,8 @@ for bedFile in sys.argv[3:]:
     samples = 0
     complete = 0
     genesToIntervals = {}
+    totalLength = 0
+    totalContainment = 0
     text = []
     for seqName, start, end, gene in parseGeneBedFile(bedFile):
         if not genesToIntervals.has_key(gene):
@@ -36,10 +38,13 @@ for bedFile in sys.argv[3:]:
     for gene in genesToIntervals.keys():
         samples += 1
         interval = getContainment(pathIntervals, genesToIntervals[gene])
+        length = sum([ abs(end - start + 1) for seqName, start, end in genesToIntervals[gene] ])
+        totalLength += length
         if interval != None:
             complete += 1
+            totalContainment += length
             text.append("_".join([ gene + "_" + "/".join([ str(j) for j in i ]) for i in genesToIntervals[gene] ]) + "_" + "/".join([ str(k) for k in interval ]))
-    tag = ET.SubElement(stats, "intervals", attrib={ "featureFile":bedFile, "complete":str(complete), "samples":str(samples) })
+    tag = ET.SubElement(stats, "intervals", attrib={ "featureFile":bedFile, "complete":str(complete), "samples":str(samples), "baseLength":str(totalLength), "totalComplete":str(totalContainment) })
     tag.text = " ".join(text)
 
 fileHandle = open(sys.argv[2], "w")
