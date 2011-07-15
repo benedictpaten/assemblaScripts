@@ -53,11 +53,6 @@ int32_t bucketNumber = 2000;
 int32_t upperLinkageBound = 200000000;
 int32_t sampleNumber = 1000000;
 
-/*
- * For the path intervals script
- */
-bool reportContigPathIntervals = 0;
-
 stList *getEventStrings(const char *hapA1EventString,
         const char *hapA2EventString) {
     stList *eventStrings = stList_construct3(0, NULL);
@@ -110,9 +105,6 @@ void basicUsage(const char *programName) {
             "-B --treatHaplotype2AsContamination : For phasing, treat haplotype 1 like contamination\n");
     fprintf(stderr,
             "-C --printHetPositions : Print out valid heterozygous columns\n");
-    fprintf(
-            stderr,
-            "-D --reportContigPathIntervals : Print out contig path intervals instead of scaffold path intervals\n");
 }
 
 int parseBasicArguments(int argc, char *argv[], const char *programName) {
@@ -152,8 +144,7 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
                 "sampleNumber", required_argument, 0, 'z' }, {
                 "treatHaplotype1AsContamination", no_argument, 0, 'A' }, {
                 "treatHaplotype2AsContamination", no_argument, 0, 'B' }, {
-                "printHetPositions", no_argument, 0, 'C' }, {
-                "reportContigPathIntervals", no_argument, 0, 'D' },
+                "printHetPositions", no_argument, 0, 'C' },
                 { 0, 0, 0, 0 } };
 
         int option_index = 0;
@@ -260,9 +251,6 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
                 break;
             case 'C':
                 printHetPositions = 1;
-                break;
-            case 'D':
-                reportContigPathIntervals = 1;
                 break;
             default:
                 st_errAbort("Unrecognised option %s", optarg);

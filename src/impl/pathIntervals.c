@@ -23,12 +23,6 @@ int main(int argc, char *argv[]) {
     stList *haplotypeEventStrings = getEventStrings(
             treatHaplotype1AsContamination ? NULL : hap1EventString,
             treatHaplotype2AsContamination ? NULL : hap2EventString);
-    stList *contaminationEventStrings =
-            getEventStrings(
-                    contaminationEventString,
-                    treatHaplotype1AsContamination ? hap1EventString
-                            : (treatHaplotype2AsContamination ? hap2EventString
-                                    : NULL));
     stList *assemblyEventStringInList = stList_construct();
     stList_append(assemblyEventStringInList, assemblyEventString);
 
@@ -37,16 +31,11 @@ int main(int argc, char *argv[]) {
         const char *hapEventString = stList_get(haplotypeEventStrings, i);
         st_logInfo("Getting contig paths for haplotype: %s", hapEventString);
         stList *hapIntervals;
-        if (reportContigPathIntervals) {
-            hapIntervals = getContigPathIntervals(flower, hapEventString,
-                    assemblyEventStringInList);
-            st_logInfo("Getting contig paths\n");
-        } else {
-            hapIntervals = getScaffoldPathIntervals(flower, hapEventString,
-                    assemblyEventStringInList, contaminationEventStrings,
-                    capCodeParameters);
-            st_logInfo("Getting scaffold paths\n");
-        }
+        stList *contigPaths = getContigPaths(flower, hapEventString, assemblyEventStringInList);
+        hapIntervals = getSplitContigPathIntervals(flower, contigPaths, hapEventString,
+                assemblyEventStringInList);
+        stList_destruct(contigPaths);
+        st_logInfo("Getting contig paths\n");
         stList_appendAll(intervals, hapIntervals);
         stList_setDestructor(hapIntervals, NULL);
         stList_destruct(hapIntervals);

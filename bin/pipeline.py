@@ -228,22 +228,16 @@ class MakeContigAndScaffoldPathIntervals(MakeStats1):
     """
     def run(self):
         #Get contig and scaffold paths
-        contigPathOutputFile = os.path.join(self.outputDir, "contigPaths.bed")
-        self.runScript("pathIntervals", contigPathOutputFile, "--reportContigPathIntervals")
-        scaffoldPathOutputFile = os.path.join(self.outputDir, "scaffoldPaths.bed")
-        self.runScript("pathIntervals", scaffoldPathOutputFile, "")
+        contigPathOutputFile = os.path.join(self.outputDir, "splitContigPaths.bed")
+        self.runScript("pathIntervals", contigPathOutputFile, "")
         #Get bed containments
         contigPathOverlapFile = os.path.join(self.outputDir, "contigPathsFeatureOverlap.xml")
         binPath = os.path.join(getRootPathString(), "bin")
         system("python %s/bedFileIntersection.py %s %s %s" % (binPath, contigPathOutputFile, contigPathOverlapFile, self.options.featureBedFiles))
-        scaffoldPathOverlapFile = os.path.join(self.outputDir, "scaffoldPathsFeatureOverlap.xml")
-        system("python %s/bedFileIntersection.py %s %s %s" % (binPath, scaffoldPathOutputFile, scaffoldPathOverlapFile, self.options.featureBedFiles))
         #Get gene containment
         contigPathGeneOverlapFile = os.path.join(self.outputDir, "contigPathsFeatureGeneOverlap.xml")
         system("python %s/bedFileGeneIntersection.py %s %s %s" % (binPath, contigPathOutputFile, contigPathGeneOverlapFile, self.options.geneBedFiles))
-        scaffoldPathGeneOverlapFile = os.path.join(self.outputDir, "scaffoldPathsFeatureGeneOverlap.xml")
-        system("python %s/bedFileGeneIntersection.py %s %s %s" % (binPath, scaffoldPathOutputFile, scaffoldPathGeneOverlapFile, self.options.geneBedFiles))
-    
+
 def main():
     ##########################################
     #Construct the arguments.
