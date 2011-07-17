@@ -15,16 +15,18 @@ def getContainers(seqName, start, end, pathIntervals):
     while i > 0:
         seqName2, start2, end2 = pathIntervals[i]
         if seqName2 != seqName:
+            assert seqName2 < seqName
             break
         if end2 < start:
             break
         i -= 1
+    j = i
     containers = []
     for i in xrange(i, len(pathIntervals)):
         seqName2, start2, end2 = pathIntervals[i]
         if seqName < seqName2 or (seqName == seqName2 and start < start2):
             if random.random() > 0.99:
-                print "path intervals"
+                print "path intervals", pathIntervals[j:i+1]
                 print "start", start, end, seqName
                 print "boo", containers
                 print "boo2", getContainers2(seqName, start, end, pathIntervals)
