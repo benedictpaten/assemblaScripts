@@ -1,19 +1,34 @@
 import sys
 import bisect
 import xml.etree.ElementTree as ET
+import random
 
 def parseBedFile(file):
     fn = lambda (seqName, start, end) : (seqName, int(start), int(end))
     return [ fn(line.split()[:3]) for line in open(file, 'r').readlines() ]
 
+def getContainers2(seqName, start, end, pathIntervals):
+    return [ (seqName2, start2, end2) for seqName2, start2, end2 in pathIntervals if seqName2 == seqName and start >= start2 and end <= end2 ]
+
 def getContainers(seqName, start, end, pathIntervals):
     i = bisect.bisect_left(pathIntervals, (seqName, start, -1))
-    if i > 0:
+    while i > 0:
+        seqName2, start2, end2 = pathIntervals[i]
+        if seqName2 != seqName:
+            break
+        if end2 < start:
+            break
         i -= 1
     containers = []
     for i in xrange(i, len(pathIntervals)):
         seqName2, start2, end2 = pathIntervals[i]
         if seqName < seqName2 or (seqName == seqName2 and start < start2):
+            if random.random() > 0.99:
+                print "path intervals"
+                print "start", start, end, seqName
+                print "boo", containers
+                print "boo2", getContainers2(seqName, start, end, pathIntervals)
+                assert containers == getContainers2(seqName, start, end, pathIntervals)
             return containers
         if seqName != seqName2:
             continue
@@ -21,7 +36,11 @@ def getContainers(seqName, start, end, pathIntervals):
             assert start >= start2
             assert seqName == seqName2
             containers.append((seqName2, start2, end2))
-    return containers
+    if random.random() > 0.99:
+        print "boo", containers
+        print "boo2", getContainers2(seqName, start, end, pathIntervals)
+        assert containers == getContainers2(seqName, start, end, pathIntervals)
+    return containers     
         
 def getContainment(pathIntervals, featureIntervals):
     samples = 0
