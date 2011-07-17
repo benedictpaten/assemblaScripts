@@ -17,7 +17,7 @@ def getContainers(seqName, start, end, pathIntervals):
         if seqName2 != seqName:
             assert seqName2 < seqName
             break
-        if end2 < start:
+        if start2 < start:
             break
         i -= 1
     j = i
