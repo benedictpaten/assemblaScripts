@@ -5,7 +5,16 @@ import random
 
 def parseBedFile(file):
     fn = lambda (seqName, start, end) : (seqName, int(start), int(end))
-    return [ fn(line.split()[:3]) for line in open(file, 'r').readlines() ]
+    intervals = [ fn(line.split()[:3]) for line in open(file, 'r').readlines() ]
+    intervals.sort()
+    seqName, start, end = intervals[0]
+    nonOverlappingIntervals = intervals[:1]
+    for seqName2, start2, end2 in intervals[1:]:
+        if seqName == seqName2 and start2 >= start and end2 <= end:
+            continue
+        seqName, start, end = seqName2, start2, end2 
+        nonOverlappingIntervals.append((seqName, start, end))
+    return nonOverlappingIntervals
 
 def getContainers2(seqName, start, end, pathIntervals):
     return [ (seqName2, start2, end2) for seqName2, start2, end2 in pathIntervals if seqName2 == seqName and start >= start2 and end <= end2 ]
@@ -60,7 +69,6 @@ def getContainment(pathIntervals, featureIntervals):
     return samples, complete, totalLength, totalContainment
 
 pathIntervals = parseBedFile(sys.argv[1])
-pathIntervals.sort()
 pathIntervalsLength = sum( [ (end - start + 1) for seqName, start, end in pathIntervals ])
 stats = ET.Element("stats", attrib={ "msaFile":sys.argv[1], "intervalsLength":str(pathIntervalsLength)})
 for bedFile in sys.argv[3:]:
