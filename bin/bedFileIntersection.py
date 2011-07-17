@@ -23,7 +23,7 @@ def getContainers(seqName, start, end, pathIntervals):
     i = bisect.bisect_left(pathIntervals, (seqName, start, -1))
     while i > 0:
         seqName2, start2, end2 = pathIntervals[i]
-        if seqName2 != seqName:
+        if seqName2 < seqName:
             break
         if end2 < start:
             break
