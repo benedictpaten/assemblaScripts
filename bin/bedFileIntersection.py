@@ -13,7 +13,7 @@ def getContainers(seqName, start, end, pathIntervals):
     containers = []
     for i in xrange(i, len(pathIntervals)):
         seqName2, start2, end2 = pathIntervals[i]
-        if seqName < seqName2 or start < start2:
+        if seqName < seqName2 or (seqName == seqName2 and start < start2):
             return containers
         if seqName != seqName2:
             continue
