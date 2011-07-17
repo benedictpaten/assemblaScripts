@@ -40,7 +40,8 @@ def getContainment(pathIntervals, featureIntervals):
 
 pathIntervals = parseBedFile(sys.argv[1])
 pathIntervals.sort()
-stats = ET.Element("stats", attrib={ "msaFile":sys.argv[1]})
+pathIntervalsLength = sum( [ (end - start + 1) for seqName, start, end in pathIntervals ])
+stats = ET.Element("stats", attrib={ "msaFile":sys.argv[1], "intervalsLength":str(pathIntervalsLength)})
 for bedFile in sys.argv[3:]:
     samples, complete, totalLength, totalContainment = getContainment(pathIntervals, parseBedFile(bedFile))
     tag = ET.SubElement(stats, "intervals", attrib={ "featureFile":bedFile, "complete":str(len(complete)), "samples":str(samples), "baseLength":str(totalLength), "totalComplete":str(totalContainment) })
