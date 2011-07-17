@@ -1,7 +1,7 @@
 import sys
 import bisect
 import xml.etree.ElementTree as ET
-from bedFileIntersection import parseBedFile, getContainer
+from bedFileIntersection import parseBedFile, getContainers
 
 def parseGeneBedFile(file):
     fn = lambda (seqName, start, end, gene) : (seqName, int(start), int(end), gene)
@@ -9,9 +9,7 @@ def parseGeneBedFile(file):
 
 def getContainment(pathIntervals, featureIntervals):
     seqName, start, end = featureIntervals[0]
-    i = getContainer(seqName, start, end, pathIntervals)
-    if i != None:
-        seqName2, start2, end2 = i
+    for seqName2, start2, end2 in getContainers(seqName, start, end, pathIntervals):
         print "Found interval %s %i %i %s %i %i" % (seqName, start, end, seqName2, start2, end2)
         for seqName, start, end in featureIntervals:
             print "alright %s %i %i %s %i %i" % (seqName, start, end, seqName2, start2, end2)
