@@ -35,7 +35,8 @@ stList *deletionDistribution = NULL;
 
 void reportHaplotypePathStatsP(Cap *cap, stList *haplotypeEventStrings, stList *contaminationEventStrings, CapCodeParameters *capCodeParameters) {
     int32_t insertLength, deleteLength;
-    switch (getCapCode(cap, haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters)) {
+    Cap *otherCap;
+    switch (getCapCode(cap, &otherCap, haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters)) {
         case HAP_SWITCH:
             totalHapSwitches++;
             return;

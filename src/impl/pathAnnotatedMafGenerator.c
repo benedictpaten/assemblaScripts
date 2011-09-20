@@ -100,10 +100,11 @@ void getMAFBlock2(Block *block, FILE *fileHandle) {
 
                 int32_t insertLength;
                 int32_t deleteLength;
+                Cap *otherCap;
                 enum CapCode _5EndStatusNerd = getCapCode(segment_get5Cap(
-                        segment), haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters);
+                        segment), &otherCap, haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters);
                 enum CapCode _3EndStatusNerd = getCapCode(segment_get3Cap(
-                        segment), haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters);
+                        segment), &otherCap, haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters);
 
                 int32_t _5EndStatus = getSimpleCode(_5EndStatusNerd);
                 int32_t _3EndStatus = getSimpleCode(_3EndStatusNerd);
