@@ -219,7 +219,7 @@ class MakeLinkageStats(MakeStats1):
     """
     def run(self):
         outputFile = os.path.join(self.outputDir, "linkageStats.xml")
-        #self.runScript("linkageStats", outputFile, "--bucketNumber 2000 --sampleNumber 100000000")
+        self.runScript("linkageStats", outputFile, "--bucketNumber 2000 --sampleNumber 1000000")
         self.addChildTarget(MakeContigAndScaffoldPathIntervals(self.outputDir, self.alignment, self.options))
         
 class MakeContigAndScaffoldPathIntervals(MakeStats1):
