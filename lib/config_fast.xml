@@ -1,79 +1,77 @@
 <cactusWorkflowConfig>
-	<alignment>
-		<iterations>
-			<iteration 
-				maxFlowerGroupSize="1000000"
-				minFlowerSize="1000"
-				type="blast"
-			>
-				<blast 
-					lastzArguments="--step=10 --seed=match12 --notransition --mismatch=2,100 --match=1,5 --ambiguous=iupac --identity=IDENTITY"
-					chunkSize="2000000" 
-					chunksPerJob="1" 
-					compressFiles="1" 
-					overlapSize="10000" 
-					filterByIdentity="1" 
-					identityRatio="6" 
-					minimumDistance="0.01" 
-					minimumSequenceLengthForBlast="30"
-				/>
-				<core 
-					alignRepeatsAtRound="0" 
-					annealingRounds="2 3 4 8 16 32 64 128" 
-					deannealingRounds="1 2 3 4 8 16 32 64 128" 
-					blockTrim="2" 
-					minimumTreeCoverage="0.8" 
-					trim="0 0 0 0 0 0 0 0 0 0 0"
-					minimumBlockDegree="2"
-				/>
-			</iteration>
-			<iteration 
-				maxFlowerGroupSize="1000000"
-				type="base" 
-			>
-				<base
-					maxFlowerGroupSize="40000"
-					numThreads="1" 
-					spanningTrees="20" 
-					gapGamma="0.2" 
-					useBanding="1" 
-					bandingLimit="100000" 
-					maxBandingSize="3000" 
-					minBandingSize="1000" 
-					minBandingConstraintDistance="300" 
-					minTraceBackDiag="42" 
-					minTraceGapDiags="10" 
-					constraintDiagonalTrim="4" 
-					minimumBlockDegree="0" 
-					alignAmbiguityCharacters="1"
-				/>
-			</iteration>
-		</iterations>
-	</alignment>
+	<preprocessor>
+	</preprocessor>
+	<setup>
+	</setup>
+	<caf
+		lastzArguments="--step=10 --seed=match12 --notransition --mismatch=2,100 --match=1,5 --ambiguous=iupac --identity=IDENTITY"
+		chunkSize="2000000" 
+		chunksPerJob="1" 
+		compressFiles="1" 
+		overlapSize="10000" 
+		filterByIdentity="1" 
+		identityRatio="6" 
+		minimumDistance="0.01" 
+		minimumSequenceLengthForBlast="30"
+		annealingRounds="2 3 4 8 16 32 64 128" 
+		deannealingRounds="1 2 3 4 8 16 32 64 128" 
+		blockTrim="2" 
+		minimumTreeCoverage="0.8" 
+		trim="0 0 0 0 0 0 0 0 0 0 0"
+		minimumBlockDegree="2"
+	>
+		<CactusCafRecursion maxFlowerGroupSize="100000000"/>
+		<CactusCafWrapper minFlowerSize="1000" maxFlowerGroupSize="1000000"/>
+	</caf>
+	<bar
+		maxFlowerGroupSize="40000"
+		numThreads="1" 
+		spanningTrees="20" 
+		gapGamma="0.2" 
+		useBanding="1" 
+		bandingLimit="100000" 
+		maxBandingSize="3000" 
+		minBandingSize="1000" 
+		minBandingConstraintDistance="300" 
+		minTraceBackDiag="42" 
+		minTraceGapDiags="10" 
+		constraintDiagonalTrim="4" 
+		minimumBlockDegree="0" 
+		alignAmbiguityCharacters="1"
+	>
+		<CactusBarRecursion maxFlowerGroupSize="100000000"/>
+		<CactusBarWrapper maxFlowerGroupSize="40000"/>
+	</bar>
 	<normal 
-		maxFlowerGroupSize="1000000"
-		maxNumberOfChains="30" 
 		iterations="2"
-	/>
-	<phylogeny
-	/>
-	<faces
-	/>
-	<reference 
+		maxNumberOfChains="30" 
+	>
+		<CactusNormalRecursion maxFlowerGroupSize="100000000" maxFlowerWrapperGroupSize="1000000"/>
+		<CactusNormalWrapper/>
+	</normal>
+	<avg
+	>
+	</avg>
+	<reference
+		buildReference="0"
 		maxFlowerGroupSize="1000000"
 		matchingAlgorithm="blossom5" 
 		reference="reference" 
 		useSimulatedAnnealing="1" 
 		theta="0.000001" 
 		maxNumberOfChainsBeforeSwitchingToFast="1000" 
-		permutations="10"
-	/>
+		permutations="10" 
+	>
+	</reference>
 	<check 
-		maxFlowerGroupSize="1000000"
 		runCheck="1"
-	/>
+		maxFlowerGroupSize="1000000"
+	>
+		<CactusCheckRecursion maxFlowerGroupSize="100000000" maxFlowerWrapperGroupSize="1000000"/>
+		<CactusCheckWrapper/>
+	</check>
 	<hal
 		buildHal="0"
-		showOnlySubstitutionsWithRespectToReference="0"
-	/>
+	>
+	</hal>
 </cactusWorkflowConfig>

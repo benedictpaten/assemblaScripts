@@ -78,8 +78,7 @@ class MakeAlignment(Target):
             cactusWorkflowExperiment.writeExperimentFile(tempExperimentFile)
             #Now run cactus workflow
             runCactusWorkflow(experimentFile=tempExperimentFile, jobTreeDir=tempJobTreeDir, 
-                              setupAndBuildAlignments=True,
-                              buildTrees=False, buildFaces=False, buildReference=True,
+                              buildAvgs=False, buildReference=True,
                               batchSystem="single_machine", maxThreads=1, jobTreeStats=True)
             logger.info("Ran the workflow")
             #Check if the jobtree completed sucessively.
