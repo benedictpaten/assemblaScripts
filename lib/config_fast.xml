@@ -71,7 +71,6 @@
 		<CactusCheckWrapper/>
 	</check>
 	<hal
-		buildHal="0"
 	>
 	</hal>
 </cactusWorkflowConfig>
