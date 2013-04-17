@@ -36,22 +36,22 @@ bool treatHaplotype2AsContamination = 0;
 /*
  * Optional parameter used by copy number and substitution scripts.
  */
-int32_t minimumBlockLength = 0;
+int64_t minimumBlockLength = 0;
 
 /*
  * Parameters for the substitution script.
  */
-int32_t ignoreFirstNBasesOfBlock = 0;
-int32_t minimumIndentity = 0;
+int64_t ignoreFirstNBasesOfBlock = 0;
+int64_t minimumIndentity = 0;
 bool printIndelPositions = 0;
 bool printHetPositions = 0;
 
 /*
  * For the linkage script.
  */
-int32_t bucketNumber = 2000;
-int32_t upperLinkageBound = 200000000;
-int32_t sampleNumber = 1000000;
+int64_t bucketNumber = 2000;
+int64_t upperLinkageBound = 200000000;
+int64_t sampleNumber = 1000000;
 
 stList *getEventStrings(const char *hapA1EventString,
         const char *hapA2EventString) {
@@ -113,7 +113,7 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
      */
     char * logLevelString = NULL;
     char * cactusDiskDatabaseString = NULL;
-    int32_t k;
+    int64_t k;
     capCodeParameters = capCodeParameters_construct(25, INT32_MAX, 100000);
     assemblyEventString = NULL;
     hap1EventString = NULL;
@@ -171,16 +171,16 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
                 basicUsage(programName);
                 return 0;
             case 'm':
-                k = sscanf(optarg, "%i", &capCodeParameters->minimumNCount);
+                k = sscanf(optarg, "%" PRIi64 "", &capCodeParameters->minimumNCount);
                 assert(k == 1);
                 break;
             case 'n':
-                k = sscanf(optarg, "%i", &capCodeParameters->maxDeletionLength);
+                k = sscanf(optarg, "%" PRIi64 "", &capCodeParameters->maxDeletionLength);
                 assert(k == 1);
                 break;
             case 'o':
                 k
-                        = sscanf(optarg, "%i",
+                        = sscanf(optarg, "%" PRIi64 "",
                                 &capCodeParameters->maxInsertionLength);
                 assert(k == 1);
                 break;
@@ -197,19 +197,19 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
                 contaminationEventString = stString_copy(optarg);
                 break;
             case 't':
-                k = sscanf(optarg, "%i", &minimumBlockLength);
+                k = sscanf(optarg, "%" PRIi64 "", &minimumBlockLength);
                 assert(k == 1);
                 break;
             case 'u':
-                k = sscanf(optarg, "%i", &ignoreFirstNBasesOfBlock);
+                k = sscanf(optarg, "%" PRIi64 "", &ignoreFirstNBasesOfBlock);
                 assert(k == 1);
                 break;
             case 'v':
-                k = sscanf(optarg, "%i", &minimumIndentity);
+                k = sscanf(optarg, "%" PRIi64 "", &minimumIndentity);
                 assert(k == 1);
                 if (minimumIndentity > 100 || minimumIndentity < 0) {
                     st_errAbort(
-                            "The minimum identity was not in the range [0, 100]: %i",
+                            "The minimum identity was not in the range [0, 100]: %" PRIi64 "",
                             minimumIndentity);
                 }
                 break;
@@ -217,29 +217,29 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
                 printIndelPositions = 1;
                 break;
             case 'x':
-                k = sscanf(optarg, "%i", &bucketNumber);
+                k = sscanf(optarg, "%" PRIi64 "", &bucketNumber);
                 assert(k == 1);
                 if (bucketNumber < 1) {
                     st_errAbort(
-                            "The number of buckets can not be less than 1: %i",
+                            "The number of buckets can not be less than 1: %" PRIi64 "",
                             bucketNumber);
                 }
                 break;
             case 'y':
-                k = sscanf(optarg, "%i", &upperLinkageBound);
+                k = sscanf(optarg, "%" PRIi64 "", &upperLinkageBound);
                 assert(k == 1);
                 if (upperLinkageBound < 1) {
                     st_errAbort(
-                            "The total interval of linkage is too small: %i",
+                            "The total interval of linkage is too small: %" PRIi64 "",
                             upperLinkageBound);
                 }
                 break;
             case 'z':
-                k = sscanf(optarg, "%i", &sampleNumber);
+                k = sscanf(optarg, "%" PRIi64 "", &sampleNumber);
                 assert(k == 1);
                 if (sampleNumber < 0) {
                     st_errAbort(
-                            "The number of samples can not be less than 0: %i",
+                            "The number of samples can not be less than 0: %" PRIi64 "",
                             sampleNumber);
                 }
                 break;

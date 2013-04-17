@@ -23,7 +23,7 @@ from sonLib.bioio import getTempFile, getTempDirectory
 from sonLib.bioio import fastaRead, fastaWrite
 from sonLib.bioio import system
 
-from jobTree.test.jobTree.jobTreeTest import runJobTreeStatusAndFailIfNotComplete
+from jobTree.src.common import runJobTreeStatusAndFailIfNotComplete
 
 def getRootPathString():
     """

@@ -14,36 +14,36 @@
 #include "assemblaCommon.h"
 #include "cactusMafs.h"
 
-int32_t totalSites = 0;
+int64_t totalSites = 0;
 double totalCorrect = 0;
-int32_t totalErrors = 0;
-int32_t totalCalls = 0;
+int64_t totalErrors = 0;
+int64_t totalCalls = 0;
 
-int32_t totalHeterozygous = 0;
+int64_t totalHeterozygous = 0;
 double totalCorrectInHeterozygous = 0;
-int32_t totalErrorsInHeterozygous = 0;
-int32_t totalCallsInHeterozygous = 0;
+int64_t totalErrorsInHeterozygous = 0;
+int64_t totalCallsInHeterozygous = 0;
 
-int32_t totalCorrectHap1InHeterozygous = 0;
-int32_t totalCorrectHap2InHeterozygous = 0;
+int64_t totalCorrectHap1InHeterozygous = 0;
+int64_t totalCorrectHap2InHeterozygous = 0;
 
-int32_t totalInOneHaplotypeOnly = 0;
+int64_t totalInOneHaplotypeOnly = 0;
 double totalCorrectInOneHaplotype = 0;
-int32_t totalErrorsInOneHaplotype = 0;
-int32_t totalCallsInOneHaplotype = 0;
+int64_t totalErrorsInOneHaplotype = 0;
+int64_t totalCallsInOneHaplotype = 0;
 
 stList *indelPositions = NULL;
 stList *hetPositions = NULL;
 
 typedef struct _segmentHolder {
     Segment *segment;
-    int32_t offset;
+    int64_t offset;
     char base1;
     char base2;
     char base3;
 } SegmentHolder;
 
-SegmentHolder *segmentHolder_construct(Segment *segment, int32_t offset, char base1, char base2, char base3) {
+SegmentHolder *segmentHolder_construct(Segment *segment, int64_t offset, char base1, char base2, char base3) {
     SegmentHolder *segmentHolder = st_malloc(sizeof(SegmentHolder));
     segmentHolder->segment = segment;
     segmentHolder->offset = offset;
@@ -54,9 +54,9 @@ SegmentHolder *segmentHolder_construct(Segment *segment, int32_t offset, char ba
 }
 
 void printPositions(stList *positions, const char *substitutionType, FILE *fileHandle) {
-    for (int32_t i = 0; i < stList_length(positions); i++) {
+    for (int64_t i = 0; i < stList_length(positions); i++) {
         SegmentHolder *segmentHolder = stList_get(positions, i);
-        int32_t j = segment_getStart(segmentHolder->segment);
+        int64_t j = segment_getStart(segmentHolder->segment);
         if (segment_getStrand(segmentHolder->segment)) {
             j += segmentHolder->offset;
             assert(
@@ -72,7 +72,7 @@ void printPositions(stList *positions, const char *substitutionType, FILE *fileH
                             == cap_getCoordinate(segment_get3Cap(segmentHolder->segment)));
         }
 
-        fprintf(fileHandle, "%s: %s_%i %i %c %c %c\n", substitutionType,
+        fprintf(fileHandle, "%s: %s_%" PRIi64 " %" PRIi64 " %c %c %c\n", substitutionType,
                 event_getHeader(segment_getEvent(segmentHolder->segment)),
                 sequence_getLength(segment_getSequence(segmentHolder->segment)), j,
                 segmentHolder->base1, segmentHolder->base2, segmentHolder->base3);
@@ -127,7 +127,7 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
             }
             double homoMatches = 0;
             double matches = 0;
-            for (int32_t i = ignoreFirstNBasesOfBlock; i < block_getLength(block) - ignoreFirstNBasesOfBlock; i++) {
+            for (int64_t i = ignoreFirstNBasesOfBlock; i < block_getLength(block) - ignoreFirstNBasesOfBlock; i++) {
                 if (hap1Seq != NULL && hap2Seq != NULL) {
                     if (toupper(hap1Seq[i]) == toupper(hap2Seq[i])) {
                         homoMatches++;
@@ -162,7 +162,7 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
 
             if (homoIdentity >= minimumIndentity && identity >= minimumIndentity) {
                 //We're in gravy.
-                for (int32_t i = ignoreFirstNBasesOfBlock; i < block_getLength(block) - ignoreFirstNBasesOfBlock; i++) {
+                for (int64_t i = ignoreFirstNBasesOfBlock; i < block_getLength(block) - ignoreFirstNBasesOfBlock; i++) {
 
                     if (hap1Seq != NULL) {
                         if (hap2Seq != NULL) {
@@ -270,20 +270,20 @@ int main(int argc, char *argv[]) {
     ///////////////////////////////////////////////////////////////////////////
 
     fprintf(fileHandle, "<substitutionStats ");
-    fprintf(fileHandle, "totalHomozygous=\"%i\" "
+    fprintf(fileHandle, "totalHomozygous=\"%" PRIi64 "\" "
         "totalCorrectInHomozygous=\"%f\" "
-        "totalErrorsInHomozygous=\"%i\" "
-        "totalCallsInHomozygous=\"%i\" "
-        "totalHeterozygous=\"%i\" "
+        "totalErrorsInHomozygous=\"%" PRIi64 "\" "
+        "totalCallsInHomozygous=\"%" PRIi64 "\" "
+        "totalHeterozygous=\"%" PRIi64 "\" "
         "totalCorrectInHeterozygous=\"%f\" "
-        "totalErrorsInHeterozygous=\"%i\" "
-        "totalCallsInHeterozygous=\"%i\" "
-        "totalCorrectHap1InHeterozygous=\"%i\" "
-        "totalCorrectHap2InHeterozygous=\"%i\" "
-        "totalInOneHaplotypeOnly=\"%i\" "
+        "totalErrorsInHeterozygous=\"%" PRIi64 "\" "
+        "totalCallsInHeterozygous=\"%" PRIi64 "\" "
+        "totalCorrectHap1InHeterozygous=\"%" PRIi64 "\" "
+        "totalCorrectHap2InHeterozygous=\"%" PRIi64 "\" "
+        "totalInOneHaplotypeOnly=\"%" PRIi64 "\" "
         "totalCorrectInOneHaplotypeOnly=\"%f\" "
-        "totalErrorsInOneHaplotypeOnly=\"%i\" "
-        "totalCallsInOneHaplotypeOnly=\"%i\" />", totalSites, totalCorrect, totalErrors, totalCalls, totalHeterozygous,
+        "totalErrorsInOneHaplotypeOnly=\"%" PRIi64 "\" "
+        "totalCallsInOneHaplotypeOnly=\"%" PRIi64 "\" />", totalSites, totalCorrect, totalErrors, totalCalls, totalHeterozygous,
             totalCorrectInHeterozygous, totalErrorsInHeterozygous, totalCallsInHeterozygous,
             totalCorrectHap1InHeterozygous, totalCorrectHap2InHeterozygous, totalInOneHaplotypeOnly,
             totalCorrectInOneHaplotype, totalErrorsInOneHaplotype, totalCallsInOneHaplotype);

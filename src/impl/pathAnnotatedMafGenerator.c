@@ -18,10 +18,10 @@ stHash *maximalScaffoldPathsLengths;
 stList *haplotypeEventStrings;
 stList *contaminationEventStrings;
 
-static int32_t getNumberOnPositiveStrand(Block *block) {
+static int64_t getNumberOnPositiveStrand(Block *block) {
     Block_InstanceIterator *it = block_getInstanceIterator(block);
     Segment *segment;
-    int32_t i = 0;
+    int64_t i = 0;
     while ((segment = block_getNext(it)) != NULL) {
         if (segment_getChildNumber(segment) == 0) {
             if (segment_getStrand(segment)) {
@@ -82,11 +82,11 @@ void getMAFBlock2(Block *block, FILE *fileHandle) {
             if (maximalHaplotypePath != NULL) {
                 assert(stHash_search(maximalHaplotypePathLengths,
                         maximalHaplotypePath) != NULL);
-                int32_t length = stIntTuple_getPosition(stHash_search(
+                int64_t length = stIntTuple_getPosition(stHash_search(
                         maximalHaplotypePathLengths, maximalHaplotypePath), 0);
                 assert(stHash_search(maximalScaffoldPathsLengths,
                         maximalHaplotypePath) != NULL);
-                int32_t scaffoldPathLength = stIntTuple_getPosition(
+                int64_t scaffoldPathLength = stIntTuple_getPosition(
                         stHash_search(maximalScaffoldPathsLengths,
                                 maximalHaplotypePath), 0);
                 assert(scaffoldPathLength >= length);
@@ -98,23 +98,23 @@ void getMAFBlock2(Block *block, FILE *fileHandle) {
                  * 3 = scaffold gap
                  */
 
-                int32_t insertLength;
-                int32_t deleteLength;
+                int64_t insertLength;
+                int64_t deleteLength;
                 Cap *otherCap;
                 enum CapCode _5EndStatusNerd = getCapCode(segment_get5Cap(
                         segment), &otherCap, haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters);
                 enum CapCode _3EndStatusNerd = getCapCode(segment_get3Cap(
                         segment), &otherCap, haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters);
 
-                int32_t _5EndStatus = getSimpleCode(_5EndStatusNerd);
-                int32_t _3EndStatus = getSimpleCode(_3EndStatusNerd);
+                int64_t _5EndStatus = getSimpleCode(_5EndStatusNerd);
+                int64_t _3EndStatus = getSimpleCode(_3EndStatusNerd);
 
                 fprintf(
                         fileHandle,
-                        "#HPL=%i 5=%i 3=%i SPL=%i 5NERD=%i 3NERD=%i\n",
+                        "#HPL=%" PRIi64 " 5=%" PRIi64 " 3=%" PRIi64 " SPL=%" PRIi64 " 5NERD=%" PRIi64 " 3NERD=%" PRIi64 "\n",
                         length, _5EndStatus, _3EndStatus,
                         scaffoldPathLength,
-                        _5EndStatusNerd, _3EndStatusNerd);
+                        (int64_t)_5EndStatusNerd, (int64_t)_3EndStatusNerd);
             }
         }
     }
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
     getMAFsReferenceOrdered(flower, fileHandle, getMAFBlock2);
 
     fclose(fileHandle);
-    st_logInfo("Got the mafs in %i seconds/\n", time(NULL) - startTime);
+    st_logInfo("Got the mafs in %" PRIi64 " seconds/\n", time(NULL) - startTime);
 
     return 0;
 }
