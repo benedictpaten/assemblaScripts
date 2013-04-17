@@ -110,7 +110,7 @@ static int compareBlocksByLength(const void *a, const void *b) {
 static stHash *maximalHaplotypePathToLength;
 
 static int64_t getHaplotypePathLength(const void *a) {
-    return stIntTuple_getPosition(stHash_search(maximalHaplotypePathToLength, (void *) a), 0);
+    return stIntTuple_get(stHash_search(maximalHaplotypePathToLength, (void *) a), 0);
 }
 
 static int compareMaximalHaplotypePaths(const void *a, const void *b) {
@@ -120,7 +120,7 @@ static int compareMaximalHaplotypePaths(const void *a, const void *b) {
 static stHash *maximalScaffoldPathToLength;
 
 static int64_t getScaffoldPathLength(const void *a) {
-    return stIntTuple_getPosition(stHash_search(maximalScaffoldPathToLength, (void *) a), 0);
+    return stIntTuple_get(stHash_search(maximalScaffoldPathToLength, (void *) a), 0);
 }
 
 static int compareScaffoldPaths(const void *a, const void *b) {
@@ -216,8 +216,8 @@ char *concatenateList(stList *list) {
     stList_sort(list, (int (*)(const void *, const void *))stIntTuple_cmpFn);
     assert(stList_length(list) % 2 == 0);
     for (int64_t i = 0; i < stList_length(list); i+=2) {
-        assert(stIntTuple_getPosition(stList_get(list, i), 0) == stIntTuple_getPosition(stList_get(list, i+1), 0));
-        cAA[i/2] = stString_print("%" PRIi64 "", stIntTuple_getPosition(stList_get(list, i), 0));
+        assert(stIntTuple_get(stList_get(list, i), 0) == stIntTuple_get(stList_get(list, i+1), 0));
+        cAA[i/2] = stString_print("%" PRIi64 "", stIntTuple_get(stList_get(list, i), 0));
     }
     char *cA = stString_join(" ", (const char **)cAA, stList_length(list)/2);
     for (int64_t i = 0; i < stList_length(list)/2; i++) {

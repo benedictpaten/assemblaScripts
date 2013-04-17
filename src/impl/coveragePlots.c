@@ -80,7 +80,7 @@ int64_t getMaximalHaplotypePathLengthP(Block *block,
                 assert(
                         stHash_search(haplotypePathLengths,
                                 maximalHaplotypePath) != NULL);
-                int64_t i = stIntTuple_getPosition(stHash_search(
+                int64_t i = stIntTuple_get(stHash_search(
                         haplotypePathLengths, maximalHaplotypePath), 0);
                 if (i > maxLength) {
                     maxLength = i;

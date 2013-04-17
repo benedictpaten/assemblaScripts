@@ -83,17 +83,17 @@ int main(int argc, char *argv[]) {
         stIntTuple *copyNumber = stList_get(copyNumbers, i);
         int64_t *columnCount = stHash_search(setOfPairs, copyNumber);
         totalColumnCount += columnCount[0];
-        totalBaseCount += stIntTuple_getPosition(copyNumber, 2) * columnCount[0];
+        totalBaseCount += stIntTuple_get(copyNumber, 2) * columnCount[0];
     }
     fprintf(fileHandle, "<copy_number_stats minimumBlockLength=\"%" PRIi64 "\" totalColumnCount=\"%" PRIi64 "\" totalBaseCount=\"%" PRIi64 "\">\n", minimumBlockLength, totalColumnCount, totalBaseCount);
     for (int64_t i = 0; i < stList_length(copyNumbers); i++) {
         stIntTuple *copyNumber = stList_get(copyNumbers, i);
         int64_t *columnCount = stHash_search(setOfPairs, copyNumber);
-        int64_t maxHapNumber = stIntTuple_getPosition(copyNumber, 0);
-        int64_t minHapNumber = stIntTuple_getPosition(copyNumber, 1);
+        int64_t maxHapNumber = stIntTuple_get(copyNumber, 0);
+        int64_t minHapNumber = stIntTuple_get(copyNumber, 1);
         assert(minHapNumber >= 0);
         assert(maxHapNumber >= minHapNumber);
-        int64_t assemblyNumber = stIntTuple_getPosition(copyNumber, 2);
+        int64_t assemblyNumber = stIntTuple_get(copyNumber, 2);
         assert(assemblyNumber >= 0);
         assert(columnCount != NULL);
         assert(columnCount[0] >= 1);

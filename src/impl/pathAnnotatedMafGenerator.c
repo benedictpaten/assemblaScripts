@@ -82,11 +82,11 @@ void getMAFBlock2(Block *block, FILE *fileHandle) {
             if (maximalHaplotypePath != NULL) {
                 assert(stHash_search(maximalHaplotypePathLengths,
                         maximalHaplotypePath) != NULL);
-                int64_t length = stIntTuple_getPosition(stHash_search(
+                int64_t length = stIntTuple_get(stHash_search(
                         maximalHaplotypePathLengths, maximalHaplotypePath), 0);
                 assert(stHash_search(maximalScaffoldPathsLengths,
                         maximalHaplotypePath) != NULL);
-                int64_t scaffoldPathLength = stIntTuple_getPosition(
+                int64_t scaffoldPathLength = stIntTuple_get(
                         stHash_search(maximalScaffoldPathsLengths,
                                 maximalHaplotypePath), 0);
                 assert(scaffoldPathLength >= length);
