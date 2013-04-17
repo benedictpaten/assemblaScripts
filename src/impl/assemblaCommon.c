@@ -114,7 +114,7 @@ int parseBasicArguments(int argc, char *argv[], const char *programName) {
     char * logLevelString = NULL;
     char * cactusDiskDatabaseString = NULL;
     int64_t k;
-    capCodeParameters = capCodeParameters_construct(25, INT32_MAX, 100000);
+    capCodeParameters = capCodeParameters_construct(25, INT64_MAX, 100000);
     assemblyEventString = NULL;
     hap1EventString = NULL;
     hap2EventString = NULL;

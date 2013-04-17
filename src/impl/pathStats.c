@@ -178,7 +178,7 @@ void traverseBlocks(Flower *flower, const char *assemblyEventString, stList *eve
 
 int64_t getN50(int64_t genomeLength, stList *objects, int64_t(*lengthFn)(const void *)) {
     int64_t totalLength = 0;
-    int64_t pJ = INT32_MAX;
+    int64_t pJ = INT64_MAX;
     for (int64_t i = 0; i < stList_length(objects); i++) {
         int64_t j = lengthFn(stList_get(objects, i));
         assert(j <= pJ);

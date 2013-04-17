@@ -133,7 +133,7 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
                         homoMatches++;
                     }
                 } else {
-                    homoMatches = INT32_MAX;
+                    homoMatches = INT64_MAX;
                 }
                 if (assemblySeq != NULL) {
                     if (hap1Seq != NULL) {
@@ -154,7 +154,7 @@ static void getSnpStats(Block *block, FILE *fileHandle) {
                         }
                     }
                 } else {
-                    matches = INT32_MAX;
+                    matches = INT64_MAX;
                 }
             }
             double homoIdentity = 100.0 * homoMatches / (block_getLength(block) - 2.0 * ignoreFirstNBasesOfBlock);
