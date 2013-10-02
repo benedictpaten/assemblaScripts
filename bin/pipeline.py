@@ -16,7 +16,7 @@ from jobTree.scriptTree.stack import Stack
 from sonLib.bioio import logger
 from sonLib.bioio import setLoggingFromOptions
 
-from cactus.shared.config import CactusWorkflowExperiment
+from cactus.shared.experimentWrapper import ExperimentWrapper
 from cactus.shared.common import runCactusWorkflow
 
 from sonLib.bioio import getTempFile, getTempDirectory
@@ -69,13 +69,14 @@ class MakeAlignment(Target):
             tempExperimentFile = getTempFile(rootDir=self.getLocalTempDir())
             tempJobTreeDir = os.path.join(self.getLocalTempDir(), "jobTree")
             #Make the experiment file
-            cactusWorkflowExperiment = CactusWorkflowExperiment(
+            cactusWorkflowExperiment = ExperimentWrapper.createExperimentWrapper(
                                                  sequences=self.haplotypeSequences + [ tempAssemblyFile ], 
                                                  newickTreeString=self.newickTree, 
-                                                 databaseName=cactusAlignmentName,
                                                  outputDir=self.getLocalTempDir(),
                                                  configFile=self.configFile)
-            cactusWorkflowExperiment.writeExperimentFile(tempExperimentFile)
+            cactusWorkflowExperiment.setDbName(cactusAlignmentName)
+            cactusWorkflowExperiment.setDbDir(os.path.join(self.getLocalTempDir(), cactusWorkflowExperiment.getDbName())) #This needs to be set to ensure the thing gets put in the right directory
+            cactusWorkflowExperiment.writeXML(tempExperimentFile)
             #Now run cactus workflow
             runCactusWorkflow(experimentFile=tempExperimentFile, jobTreeDir=tempJobTreeDir, 
                               buildAvgs=False, buildReference=True,
@@ -89,9 +90,10 @@ class MakeAlignment(Target):
             tempJobTreeStatsFile = os.path.join(self.getLocalTempDir(),"jobTreeStats.xml")
             system("jobTreeStats --jobTree %s --outputFile %s" % (tempJobTreeDir, tempJobTreeStatsFile))
             #Now copy the true assembly back to the output
-            system("mv %s %s/config.xml" % (tempExperimentFile, self.outputDir))
-            system("mv %s %s/" % (tempJobTreeStatsFile, self.outputDir))
-            system("mv %s %s/" % (cactusAlignmentDir, self.outputDir))
+            system("mv %s/* %s" % (self.getLocalTempDir(), self.outputDir))
+            #system("mv %s %s/config.xml" % (tempExperimentFile, self.outputDir))
+            #system("mv %s %s/" % (tempJobTreeStatsFile, self.outputDir))
+            #system("mv %s %s/" % (cactusAlignmentDir, self.outputDir))
             assert os.path.exists(cactusAlignment)
             #We're done!
         self.addChildTarget(MakeStats1(self.outputDir, cactusAlignment, self.options))
