@@ -29,22 +29,22 @@ extern bool treatHaplotype2AsContamination;
 /*
  * Optional parameter used by copy number and substitution scripts.
  */
-extern int32_t minimumBlockLength;
+extern int64_t minimumBlockLength;
 
 /*
  * Parameters for the substitution script.
  */
-extern int32_t ignoreFirstNBasesOfBlock;
-extern int32_t minimumIndentity;
+extern int64_t ignoreFirstNBasesOfBlock;
+extern int64_t minimumIndentity;
 extern bool printIndelPositions;
 extern bool printHetPositions;
 
 /*
  * For the linkage script.
  */
-extern int32_t bucketNumber;
-extern int32_t upperLinkageBound;
-extern int32_t sampleNumber;
+extern int64_t bucketNumber;
+extern int64_t upperLinkageBound;
+extern int64_t sampleNumber;
 
 stList *getEventStrings(const char *hapA1EventString, const char *hapA2EventString);
 

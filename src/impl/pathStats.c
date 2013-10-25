@@ -12,29 +12,29 @@
 #include "scaffoldPaths.h"
 #include "assemblaCommon.h"
 
-int32_t totalHapSwitches = 0;
+int64_t totalHapSwitches = 0;
 
-int32_t totalCleanEnds = 0;
-int32_t totalHangingEndWithsNs = 0;
+int64_t totalCleanEnds = 0;
+int64_t totalHangingEndWithsNs = 0;
 
-int32_t totalScaffoldGaps = 0;
-int32_t totalAmbiguityGaps = 0;
+int64_t totalScaffoldGaps = 0;
+int64_t totalAmbiguityGaps = 0;
 
-int32_t totalHaplotypeLength = 0;
+int64_t totalHaplotypeLength = 0;
 
-int32_t totalErrorsHapToHapSameChromosome = 0;
-int32_t totalErrorsInterJoin = 0;
-int32_t totalErrorsHapToContamination = 0;
-int32_t totalErrorsHapToInsertToContamination = 0;
-int32_t totalErrorsInsertion = 0;
-int32_t totalErrorsDeleteion = 0;
-int32_t totalErrorsInsertionAndDeletion = 0;
-int32_t totalErrorsHangingInsertion = 0;
+int64_t totalErrorsHapToHapSameChromosome = 0;
+int64_t totalErrorsInterJoin = 0;
+int64_t totalErrorsHapToContamination = 0;
+int64_t totalErrorsHapToInsertToContamination = 0;
+int64_t totalErrorsInsertion = 0;
+int64_t totalErrorsDeleteion = 0;
+int64_t totalErrorsInsertionAndDeletion = 0;
+int64_t totalErrorsHangingInsertion = 0;
 stList *insertionDistribution = NULL;
 stList *deletionDistribution = NULL;
 
 void reportHaplotypePathStatsP(Cap *cap, stList *haplotypeEventStrings, stList *contaminationEventStrings, CapCodeParameters *capCodeParameters) {
-    int32_t insertLength, deleteLength;
+    int64_t insertLength, deleteLength;
     Cap *otherCap;
     switch (getCapCode(cap, &otherCap, haplotypeEventStrings, contaminationEventStrings, &insertLength, &deleteLength, capCodeParameters)) {
         case HAP_SWITCH:
@@ -69,19 +69,19 @@ void reportHaplotypePathStatsP(Cap *cap, stList *haplotypeEventStrings, stList *
             return;
         case ERROR_HAP_TO_INSERT:
             assert(insertLength > 0);
-            stList_append(insertionDistribution, stIntTuple_construct(1, insertLength));
+            stList_append(insertionDistribution, stIntTuple_construct1( insertLength));
             totalErrorsInsertion++;
             return;
         case ERROR_HAP_TO_DELETION:
             assert(deleteLength > 0);
-            stList_append(deletionDistribution, stIntTuple_construct(1, deleteLength));
+            stList_append(deletionDistribution, stIntTuple_construct1( deleteLength));
             totalErrorsDeleteion++;
             return;
         case ERROR_HAP_TO_INSERT_AND_DELETION:
             assert(insertLength > 0);
             assert(deleteLength > 0);
-            stList_append(insertionDistribution, stIntTuple_construct(1, insertLength));
-            stList_append(deletionDistribution, stIntTuple_construct(1, deleteLength));
+            stList_append(insertionDistribution, stIntTuple_construct1( insertLength));
+            stList_append(deletionDistribution, stIntTuple_construct1( deleteLength));
             totalErrorsInsertionAndDeletion++;
             return;
         case ERROR_CONTIG_END_WITH_INSERT:
@@ -90,7 +90,7 @@ void reportHaplotypePathStatsP(Cap *cap, stList *haplotypeEventStrings, stList *
     }
 }
 
-static int32_t totalPathLength = 0; //sum of all blocks containing haplotype and assembly.
+static int64_t totalPathLength = 0; //sum of all blocks containing haplotype and assembly.
 static stSortedSet *contigsSet;
 static stSortedSet *haplotypesSet;
 static stList *blockList;
@@ -109,8 +109,8 @@ static int compareBlocksByLength(const void *a, const void *b) {
 
 static stHash *maximalHaplotypePathToLength;
 
-static int32_t getHaplotypePathLength(const void *a) {
-    return stIntTuple_getPosition(stHash_search(maximalHaplotypePathToLength, (void *) a), 0);
+static int64_t getHaplotypePathLength(const void *a) {
+    return stIntTuple_get(stHash_search(maximalHaplotypePathToLength, (void *) a), 0);
 }
 
 static int compareMaximalHaplotypePaths(const void *a, const void *b) {
@@ -119,8 +119,8 @@ static int compareMaximalHaplotypePaths(const void *a, const void *b) {
 
 static stHash *maximalScaffoldPathToLength;
 
-static int32_t getScaffoldPathLength(const void *a) {
-    return stIntTuple_getPosition(stHash_search(maximalScaffoldPathToLength, (void *) a), 0);
+static int64_t getScaffoldPathLength(const void *a) {
+    return stIntTuple_get(stHash_search(maximalScaffoldPathToLength, (void *) a), 0);
 }
 
 static int compareScaffoldPaths(const void *a, const void *b) {
@@ -143,7 +143,7 @@ void accumulateBlock(Block *block, const char *assemblyEventString, stList *even
         if (strcmp(event_getHeader(segment_getEvent(segment)), assemblyEventString) == 0) {
             stSortedSet_insert(contigsSet, sequence);
         }
-        for(int32_t i=0; i<stList_length(eventStrings); i++) {
+        for(int64_t i=0; i<stList_length(eventStrings); i++) {
             if(strcmp(event_getHeader(segment_getEvent(segment)), stList_get(eventStrings, i)) == 0) {
                 stSortedSet_insert(haplotypesSet, sequence);
                 break;
@@ -176,11 +176,11 @@ void traverseBlocks(Flower *flower, const char *assemblyEventString, stList *eve
     flower_destructBlockIterator(blockIt);
 }
 
-int32_t getN50(int32_t genomeLength, stList *objects, int32_t(*lengthFn)(const void *)) {
-    int32_t totalLength = 0;
-    int32_t pJ = INT32_MAX;
-    for (int32_t i = 0; i < stList_length(objects); i++) {
-        int32_t j = lengthFn(stList_get(objects, i));
+int64_t getN50(int64_t genomeLength, stList *objects, int64_t(*lengthFn)(const void *)) {
+    int64_t totalLength = 0;
+    int64_t pJ = INT64_MAX;
+    for (int64_t i = 0; i < stList_length(objects); i++) {
+        int64_t j = lengthFn(stList_get(objects, i));
         assert(j <= pJ);
         pJ = j;
         totalLength += j;
@@ -215,12 +215,12 @@ char *concatenateList(stList *list) {
     char **cAA = st_malloc(sizeof(char *) * (stList_length(list)/2));
     stList_sort(list, (int (*)(const void *, const void *))stIntTuple_cmpFn);
     assert(stList_length(list) % 2 == 0);
-    for (int32_t i = 0; i < stList_length(list); i+=2) {
-        assert(stIntTuple_getPosition(stList_get(list, i), 0) == stIntTuple_getPosition(stList_get(list, i+1), 0));
-        cAA[i/2] = stString_print("%i", stIntTuple_getPosition(stList_get(list, i), 0));
+    for (int64_t i = 0; i < stList_length(list); i+=2) {
+        assert(stIntTuple_get(stList_get(list, i), 0) == stIntTuple_get(stList_get(list, i+1), 0));
+        cAA[i/2] = stString_print("%" PRIi64 "", stIntTuple_get(stList_get(list, i), 0));
     }
     char *cA = stString_join(" ", (const char **)cAA, stList_length(list)/2);
-    for (int32_t i = 0; i < stList_length(list)/2; i++) {
+    for (int64_t i = 0; i < stList_length(list)/2; i++) {
         free(cAA[i]);
     }
     free(cAA);
@@ -242,10 +242,10 @@ void reportSamplePathStats(Flower *flower, FILE *fileHandle,
     insertionDistribution = stList_construct3(0, (void(*)(void *)) stIntTuple_destruct);
     deletionDistribution = stList_construct3(0, (void(*)(void *)) stIntTuple_destruct);
 
-    for (int32_t i = 0; i < stList_length(maximalHaplotypePaths); i++) {
+    for (int64_t i = 0; i < stList_length(maximalHaplotypePaths); i++) {
         stList *maximalHaplotypePath = stList_get(maximalHaplotypePaths, i);
         totalHaplotypeLength += contigPathLength(maximalHaplotypePath);
-        for (int32_t j = 0; j < stList_length(maximalHaplotypePath); j++) {
+        for (int64_t j = 0; j < stList_length(maximalHaplotypePath); j++) {
             Segment *segment = stList_get(maximalHaplotypePath, j);
             reportHaplotypePathStatsP(segment_get5Cap(segment), haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
             reportHaplotypePathStatsP(segment_get3Cap(segment), haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
@@ -266,29 +266,29 @@ void reportSamplePathStats(Flower *flower, FILE *fileHandle,
     stList *scaffoldPaths = getScaffoldPathsList(maximalHaplotypePaths, haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
     stList_sort(scaffoldPaths, compareScaffoldPaths);
 
-    int32_t totalSequencesLength = 0;
-    for (int32_t i = 0; i < stList_length(sequences); i++) {
+    int64_t totalSequencesLength = 0;
+    for (int64_t i = 0; i < stList_length(sequences); i++) {
         totalSequencesLength += sequence_getLength(stList_get(sequences, i));
     }
 
-    int32_t averageHaplotypeLength = 0; //average length of the two haplotypes.
-    for (int32_t i = 0; i < stList_length(haplotypes); i++) {
+    int64_t averageHaplotypeLength = 0; //average length of the two haplotypes.
+    for (int64_t i = 0; i < stList_length(haplotypes); i++) {
         averageHaplotypeLength += sequence_getLength(stList_get(haplotypes, i));
     }
     averageHaplotypeLength /= stList_length(haplotypeEventStrings);
 
-    int32_t totalBlockNumber = stList_length(blockList);
-    int32_t blockNG50 = getN50(averageHaplotypeLength, blockList, (int32_t(*)(const void *)) block_getLength);
-    int32_t contigN50 = getN50(totalSequencesLength, sequences, (int32_t(*)(const void *)) sequence_getLength); //length of contig which appears in order (from longest to shortest) at 50% coverage.
-    int32_t contigNG50 = getN50(averageHaplotypeLength, sequences, (int32_t(*)(const void *)) sequence_getLength); //length of contig which appears in order (from longest to shortest) at 50% coverage.
-    int32_t haplotypePathNG50 = getN50(averageHaplotypeLength, maximalHaplotypePaths, getHaplotypePathLength); //length of maximal haplotype path which appears in order (from longest to shortest) at 50% coverage.
-    int32_t scaffoldPathNG50 = getN50(averageHaplotypeLength, scaffoldPaths, getScaffoldPathLength); //length of maximal scaffold path which appears in order (from longest to shortest) at 50% coverage.
+    int64_t totalBlockNumber = stList_length(blockList);
+    int64_t blockNG50 = getN50(averageHaplotypeLength, blockList, (int64_t(*)(const void *)) block_getLength);
+    int64_t contigN50 = getN50(totalSequencesLength, sequences, (int64_t(*)(const void *)) sequence_getLength); //length of contig which appears in order (from longest to shortest) at 50% coverage.
+    int64_t contigNG50 = getN50(averageHaplotypeLength, sequences, (int64_t(*)(const void *)) sequence_getLength); //length of contig which appears in order (from longest to shortest) at 50% coverage.
+    int64_t haplotypePathNG50 = getN50(averageHaplotypeLength, maximalHaplotypePaths, getHaplotypePathLength); //length of maximal haplotype path which appears in order (from longest to shortest) at 50% coverage.
+    int64_t scaffoldPathNG50 = getN50(averageHaplotypeLength, scaffoldPaths, getScaffoldPathLength); //length of maximal scaffold path which appears in order (from longest to shortest) at 50% coverage.
 
-    int32_t totalContigNumber = stSortedSet_size(contigsSet); //number of contigs
-    int32_t totalHaplotypePaths = stList_length(maximalHaplotypePaths); //number of haplotype paths
-    int32_t totalScaffoldPaths = stList_length(scaffoldPaths); //number of scaffold paths
+    int64_t totalContigNumber = stSortedSet_size(contigsSet); //number of contigs
+    int64_t totalHaplotypePaths = stList_length(maximalHaplotypePaths); //number of haplotype paths
+    int64_t totalScaffoldPaths = stList_length(scaffoldPaths); //number of scaffold paths
 
-    int32_t totalErrors = totalErrorsHapToHapSameChromosome / 2 + totalErrorsInterJoin / 2
+    int64_t totalErrors = totalErrorsHapToHapSameChromosome / 2 + totalErrorsInterJoin / 2
             + totalErrorsHapToContamination + totalErrorsHapToInsertToContamination + totalErrorsInsertion / 2
             + totalErrorsDeleteion / 2 + totalErrorsInsertionAndDeletion / 2 + totalErrorsHangingInsertion;
 
@@ -308,23 +308,23 @@ void reportSamplePathStats(Flower *flower, FILE *fileHandle,
     char *insertionDistributionString = concatenateList(insertionDistribution);
     char *deletionDistributionString = concatenateList(deletionDistribution);
 
-    fprintf(fileHandle, "<stats totalHaplotypeSwitches=\"%i\" "
-        "totalScaffoldGaps=\"%i\" "
-        "totalAmbiguityGaps=\"%i\" "
-        "totalContigEnds=\"%i\" "
-        "totalContigEndsWithNs=\"%i\" "
-        "totalErrorsHaplotypeToHaplotypeSameChromosome=\"%i\" "
-        "totalErrorsHaplotypeToHaplotypeDifferentChromosome=\"%i\" "
-        "totalErrorsHaplotypeToContamination=\"%i\" "
-        "totalErrorsHaplotypeToInsertionToContamination=\"%i\" "
-        "totalErrorsHaplotypeToInsertion=\"%i\" "
-        "totalErrorsHaplotypeToDeletion=\"%i\" "
-        "totalErrorsHaplotypeToInsertionAndDeletion=\"%i\" "
-        "totalErrorsContigEndsWithInsert=\"%i\" "
-        "totalErrors=\"%i\" totalPathLength=\"%i\" genotypeLength=\"%i\" "
-        "totalContigsLength=\"%i\" coverage=\"%f\" blockNG50=\"%i\" contigN50=\"%i\" "
-        "contigNG50=\"%i\" contigPathNG50=\"%i\" scaffoldPathNG50=\"%i\" totalBlockNumber=\"%i\" "
-        "totalContigNumber=\"%i\" totalHaplotypePaths=\"%i\" totalScaffoldPaths=\"%i\" "
+    fprintf(fileHandle, "<stats totalHaplotypeSwitches=\"%" PRIi64 "\" "
+        "totalScaffoldGaps=\"%" PRIi64 "\" "
+        "totalAmbiguityGaps=\"%" PRIi64 "\" "
+        "totalContigEnds=\"%" PRIi64 "\" "
+        "totalContigEndsWithNs=\"%" PRIi64 "\" "
+        "totalErrorsHaplotypeToHaplotypeSameChromosome=\"%" PRIi64 "\" "
+        "totalErrorsHaplotypeToHaplotypeDifferentChromosome=\"%" PRIi64 "\" "
+        "totalErrorsHaplotypeToContamination=\"%" PRIi64 "\" "
+        "totalErrorsHaplotypeToInsertionToContamination=\"%" PRIi64 "\" "
+        "totalErrorsHaplotypeToInsertion=\"%" PRIi64 "\" "
+        "totalErrorsHaplotypeToDeletion=\"%" PRIi64 "\" "
+        "totalErrorsHaplotypeToInsertionAndDeletion=\"%" PRIi64 "\" "
+        "totalErrorsContigEndsWithInsert=\"%" PRIi64 "\" "
+        "totalErrors=\"%" PRIi64 "\" totalPathLength=\"%" PRIi64 "\" genotypeLength=\"%" PRIi64 "\" "
+        "totalContigsLength=\"%" PRIi64 "\" coverage=\"%f\" blockNG50=\"%" PRIi64 "\" contigN50=\"%" PRIi64 "\" "
+        "contigNG50=\"%" PRIi64 "\" contigPathNG50=\"%" PRIi64 "\" scaffoldPathNG50=\"%" PRIi64 "\" totalBlockNumber=\"%" PRIi64 "\" "
+        "totalContigNumber=\"%" PRIi64 "\" totalHaplotypePaths=\"%" PRIi64 "\" totalScaffoldPaths=\"%" PRIi64 "\" "
         "errorsPerContig=\"%f\" errorsPerMappedBase=\"%f\" "
         "insertionErrorSizeDistribution=\"%s\" "
         "deletionErrorSizeDistribution=\"%s\"/>", totalHapSwitches / 2,
@@ -361,7 +361,7 @@ int main(int argc, char *argv[]) {
 
     reportSamplePathStats(flower, fileHandle, assemblyEventString, haplotypeEventStrings, contaminationEventStrings, capCodeParameters);
     fclose(fileHandle);
-    st_logInfo("Got the stats in %i seconds/\n", time(NULL) - startTime);
+    st_logInfo("Got the stats in %" PRIi64 " seconds/\n", time(NULL) - startTime);
 
     return 0;
 }

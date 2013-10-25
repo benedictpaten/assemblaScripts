@@ -16,14 +16,14 @@ from jobTree.scriptTree.stack import Stack
 from sonLib.bioio import logger
 from sonLib.bioio import setLoggingFromOptions
 
-from cactus.shared.config import CactusWorkflowExperiment
+from cactus.shared.experimentWrapper import ExperimentWrapper
 from cactus.shared.common import runCactusWorkflow
 
 from sonLib.bioio import getTempFile, getTempDirectory
 from sonLib.bioio import fastaRead, fastaWrite
 from sonLib.bioio import system
 
-from jobTree.test.jobTree.jobTreeTest import runJobTreeStatusAndFailIfNotComplete
+from jobTree.src.common import runJobTreeStatusAndFailIfNotComplete
 
 def getRootPathString():
     """
@@ -69,17 +69,17 @@ class MakeAlignment(Target):
             tempExperimentFile = getTempFile(rootDir=self.getLocalTempDir())
             tempJobTreeDir = os.path.join(self.getLocalTempDir(), "jobTree")
             #Make the experiment file
-            cactusWorkflowExperiment = CactusWorkflowExperiment(
+            cactusWorkflowExperiment = ExperimentWrapper.createExperimentWrapper(
                                                  sequences=self.haplotypeSequences + [ tempAssemblyFile ], 
                                                  newickTreeString=self.newickTree, 
-                                                 databaseName=cactusAlignmentName,
                                                  outputDir=self.getLocalTempDir(),
                                                  configFile=self.configFile)
-            cactusWorkflowExperiment.writeExperimentFile(tempExperimentFile)
+            cactusWorkflowExperiment.setDbName(cactusAlignmentName)
+            cactusWorkflowExperiment.setDbDir(os.path.join(self.getLocalTempDir(), cactusWorkflowExperiment.getDbName())) #This needs to be set to ensure the thing gets put in the right directory
+            cactusWorkflowExperiment.writeXML(tempExperimentFile)
             #Now run cactus workflow
             runCactusWorkflow(experimentFile=tempExperimentFile, jobTreeDir=tempJobTreeDir, 
-                              setupAndBuildAlignments=True,
-                              buildTrees=False, buildFaces=False, buildReference=True,
+                              buildAvgs=False, buildReference=True,
                               batchSystem="single_machine", maxThreads=1, jobTreeStats=True)
             logger.info("Ran the workflow")
             #Check if the jobtree completed sucessively.
@@ -90,9 +90,10 @@ class MakeAlignment(Target):
             tempJobTreeStatsFile = os.path.join(self.getLocalTempDir(),"jobTreeStats.xml")
             system("jobTreeStats --jobTree %s --outputFile %s" % (tempJobTreeDir, tempJobTreeStatsFile))
             #Now copy the true assembly back to the output
-            system("mv %s %s/config.xml" % (tempExperimentFile, self.outputDir))
-            system("mv %s %s/" % (tempJobTreeStatsFile, self.outputDir))
-            system("mv %s %s/" % (cactusAlignmentDir, self.outputDir))
+            system("mv %s/* %s" % (self.getLocalTempDir(), self.outputDir))
+            #system("mv %s %s/config.xml" % (tempExperimentFile, self.outputDir))
+            #system("mv %s %s/" % (tempJobTreeStatsFile, self.outputDir))
+            #system("mv %s %s/" % (cactusAlignmentDir, self.outputDir))
             assert os.path.exists(cactusAlignment)
             #We're done!
         self.addChildTarget(MakeStats1(self.outputDir, cactusAlignment, self.options))
@@ -220,7 +221,7 @@ class MakeLinkageStats(MakeStats1):
     """
     def run(self):
         outputFile = os.path.join(self.outputDir, "linkageStats.xml")
-        self.runScript("linkageStats", outputFile, "--bucketNumber 2000 --sampleNumber 100000000")
+        self.runScript("linkageStats", outputFile, "--bucketNumber 2000 --sampleNumber 1000000")
         self.addChildTarget(MakeContigAndScaffoldPathIntervals(self.outputDir, self.alignment, self.options))
         
 class MakeContigAndScaffoldPathIntervals(MakeStats1):

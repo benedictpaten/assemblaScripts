@@ -24,10 +24,10 @@
 
 typedef struct _blockHolder {
     Block *block;
-    int32_t blockLength;
-    int32_t haplotypePathLength;
-    int32_t scaffoldPathLength;
-    int32_t contigLength;
+    int64_t blockLength;
+    int64_t haplotypePathLength;
+    int64_t scaffoldPathLength;
+    int64_t contigLength;
 
     /*
      * Categories as follows:
@@ -40,7 +40,7 @@ typedef struct _blockHolder {
      * !hap1/hap2/!assembly = 5
      * !hap1/!hap2/assembly = 6
      */
-    int32_t haplotypeCategory;
+    int64_t haplotypeCategory;
     /*
      * Categories as follows:
      *
@@ -48,7 +48,7 @@ typedef struct _blockHolder {
      * contamination/!assembly = 1
      * !contamination/assembly = 2
      */
-    int32_t contaminationCategory;
+    int64_t contaminationCategory;
     /*
      * Categories as follows:
      *
@@ -56,18 +56,18 @@ typedef struct _blockHolder {
      * contamination/!hap = 1
      * !contamination/hap = 2
      */
-    int32_t haplotypeToContaminationCategory;
+    int64_t haplotypeToContaminationCategory;
 } BlockHolder;
 
 stHash *segmentsToMaximalHaplotypePaths;
 stHash *maximalHaplotypePathLengths;
 stHash *maximalScaffoldPathLengths;
 
-int32_t getMaximalHaplotypePathLengthP(Block *block,
+int64_t getMaximalHaplotypePathLengthP(Block *block,
         stHash *segmentToHaplotypePath, stHash *haplotypePathLengths) {
     Segment *segment;
     Block_InstanceIterator *instanceIt = block_getInstanceIterator(block);
-    int32_t maxLength = 0;
+    int64_t maxLength = 0;
     while ((segment = block_getNext(instanceIt)) != NULL) {
         if (strcmp(event_getHeader(segment_getEvent(segment)), assemblyEventString) == 0) { //Establish if we need a line..
             stList *maximalHaplotypePath = stHash_search(
@@ -80,7 +80,7 @@ int32_t getMaximalHaplotypePathLengthP(Block *block,
                 assert(
                         stHash_search(haplotypePathLengths,
                                 maximalHaplotypePath) != NULL);
-                int32_t i = stIntTuple_getPosition(stHash_search(
+                int64_t i = stIntTuple_get(stHash_search(
                         haplotypePathLengths, maximalHaplotypePath), 0);
                 if (i > maxLength) {
                     maxLength = i;
@@ -93,20 +93,20 @@ int32_t getMaximalHaplotypePathLengthP(Block *block,
     return maxLength;
 }
 
-int32_t getMaximalHaplotypePathLength(Block *block) {
+int64_t getMaximalHaplotypePathLength(Block *block) {
     return getMaximalHaplotypePathLengthP(block,
             segmentsToMaximalHaplotypePaths, maximalHaplotypePathLengths);
 }
 
-int32_t getMaximalScaffoldPathLength(Block *block) {
+int64_t getMaximalScaffoldPathLength(Block *block) {
     return getMaximalHaplotypePathLengthP(block,
             segmentsToMaximalHaplotypePaths, maximalScaffoldPathLengths);
 }
 
-int32_t getMaximalContigLength(Block *block) {
+int64_t getMaximalContigLength(Block *block) {
     Segment *segment;
     Block_InstanceIterator *instanceIt = block_getInstanceIterator(block);
-    int32_t maxLength = 0;
+    int64_t maxLength = 0;
     while ((segment = block_getNext(instanceIt)) != NULL) {
         if (strcmp(event_getHeader(segment_getEvent(segment)), assemblyEventString) == 0) { //Establish if we need a line..
             Sequence *sequence = segment_getSequence(segment);
@@ -139,22 +139,22 @@ stSortedSet *getSpecies(Block *block) {
     return species;
 }
 
-int32_t getHaplotypeCategory(stSortedSet *species) {
-    int32_t i = stSortedSet_search(species, assemblyEventString) == NULL ? 1 : 0;
-    int32_t j = stSortedSet_search(species, hap1EventString) == NULL ? 2 : 0;
-    int32_t k = stSortedSet_search(species, hap2EventString) == NULL ? 4 : 0;
+int64_t getHaplotypeCategory(stSortedSet *species) {
+    int64_t i = stSortedSet_search(species, assemblyEventString) == NULL ? 1 : 0;
+    int64_t j = stSortedSet_search(species, hap1EventString) == NULL ? 2 : 0;
+    int64_t k = stSortedSet_search(species, hap2EventString) == NULL ? 4 : 0;
     return i + j + k;
 }
 
-int32_t getContaminationCategory(stSortedSet *species) {
-    int32_t i = stSortedSet_search(species, assemblyEventString) == NULL ? 1 : 0;
-    int32_t j = stSortedSet_search(species, contaminationEventString) == NULL ? 2 : 0;
+int64_t getContaminationCategory(stSortedSet *species) {
+    int64_t i = stSortedSet_search(species, assemblyEventString) == NULL ? 1 : 0;
+    int64_t j = stSortedSet_search(species, contaminationEventString) == NULL ? 2 : 0;
     return i + j;
 }
 
-int32_t getHaplotypeContaminationCategory(stSortedSet *species) {
-    int32_t i = stSortedSet_search(species, contaminationEventString) == NULL ? 1 : 0;
-    int32_t j = (stSortedSet_search(species, hap1EventString) == NULL
+int64_t getHaplotypeContaminationCategory(stSortedSet *species) {
+    int64_t i = stSortedSet_search(species, contaminationEventString) == NULL ? 1 : 0;
+    int64_t j = (stSortedSet_search(species, hap1EventString) == NULL
             && stSortedSet_search(species, hap2EventString) == NULL) ? 2 : 0;
     return i + j;
 }
@@ -227,63 +227,63 @@ static int blockHolder_compareByContigLength(const BlockHolder *blockHolder1,
     return blockHolder1->contigLength - blockHolder2->contigLength;
 }
 
-static int32_t blockHolder_getBlockLength(const BlockHolder *blockHolder) {
+static int64_t blockHolder_getBlockLength(const BlockHolder *blockHolder) {
     return blockHolder->blockLength;
 }
 
-static int32_t blockHolder_getHaplotypePathLength(
+static int64_t blockHolder_getHaplotypePathLength(
         const BlockHolder *blockHolder) {
     return blockHolder->haplotypePathLength;
 }
 
-static int32_t blockHolder_getScaffoldPathLength(const BlockHolder *blockHolder) {
+static int64_t blockHolder_getScaffoldPathLength(const BlockHolder *blockHolder) {
     return blockHolder->scaffoldPathLength;
 }
 
-static int32_t blockHolder_getContigLength(const BlockHolder *blockHolder) {
+static int64_t blockHolder_getContigLength(const BlockHolder *blockHolder) {
     return blockHolder->contigLength;
 }
 
-static int32_t blockHolder_getHaplotypeCategory(const BlockHolder *blockHolder) {
+static int64_t blockHolder_getHaplotypeCategory(const BlockHolder *blockHolder) {
     return blockHolder->haplotypeCategory;
 }
 
-static int32_t blockHolder_getContaminationCategory(const BlockHolder *blockHolder) {
+static int64_t blockHolder_getContaminationCategory(const BlockHolder *blockHolder) {
     return blockHolder->contaminationCategory;
 }
 
-static int32_t blockHolder_getHaplotypeContaminationCategory(
+static int64_t blockHolder_getHaplotypeContaminationCategory(
         const BlockHolder *blockHolder) {
     return blockHolder->haplotypeToContaminationCategory;
 }
 
 static void printCumulativeLengthPlots(stList *blockHolders, int(*cmpFn)(
-        const BlockHolder *, const BlockHolder *), int32_t(*getCategory)(
-        const BlockHolder *), int32_t(*getLength)(const BlockHolder *),
-        int32_t categoryNumber, const char **categoryNames,
+        const BlockHolder *, const BlockHolder *), int64_t(*getCategory)(
+        const BlockHolder *), int64_t(*getLength)(const BlockHolder *),
+        int64_t categoryNumber, const char **categoryNames,
         const char *outputFile) {
     FILE *fileHandle = fopen(outputFile, "w");
 
     stList_sort(blockHolders, (int(*)(const void *, const void *)) cmpFn);
 
-    int32_t binNumber = 2000;
+    int64_t binNumber = 2000;
     double binSize = 8.0 / binNumber; //We go up to 100,000,000
     int64_t *cumulativeLengths = st_malloc(sizeof(int64_t) * categoryNumber
             * (binNumber + 1));
-    for (int32_t i = 0; i < categoryNumber; i++) {
+    for (int64_t i = 0; i < categoryNumber; i++) {
         cumulativeLengths[i] = 0;
     }
-    for (int32_t i = 0; i < stList_length(blockHolders); i++) { //Get the start values
+    for (int64_t i = 0; i < stList_length(blockHolders); i++) { //Get the start values
         BlockHolder *blockHolder = stList_get(blockHolders, i);
         cumulativeLengths[getCategory(blockHolder)]
                 += blockHolder_getBlockLength(blockHolder);
     }
 
-    int32_t j = 0; //index of bin
+    int64_t j = 0; //index of bin
     //Get cumulative values for the remaining bins
-    for (int32_t i = 1; i <= binNumber; i++) {
+    for (int64_t i = 1; i <= binNumber; i++) {
         //Copy across the cumulative values from the previous bin
-        for (int32_t k = 0; k < categoryNumber; k++) {
+        for (int64_t k = 0; k < categoryNumber; k++) {
             cumulativeLengths[i * categoryNumber + k] = cumulativeLengths[(i
                     - 1) * categoryNumber + k];
         }
@@ -313,13 +313,13 @@ static void printCumulativeLengthPlots(stList *blockHolders, int(*cmpFn)(
 
     //Now print the final values..
     fprintf(fileHandle, "category\t");
-    for (int32_t i = 0; i <= binNumber; i++) {
-        fprintf(fileHandle, "%i\t", (int32_t) pow(10, i * binSize));
+    for (int64_t i = 0; i <= binNumber; i++) {
+        fprintf(fileHandle, "%" PRIi64 "\t", (int64_t) pow(10, i * binSize));
     }
     fprintf(fileHandle, "\n");
     for (j = 0; j < categoryNumber; j++) {
         fprintf(fileHandle, "%s\t", categoryNames[j]);
-        for (int32_t i = 0; i <= binNumber; i++) {
+        for (int64_t i = 0; i <= binNumber; i++) {
             fprintf(fileHandle, "%lli\t", (long long int) cumulativeLengths[i
                     * categoryNumber + j]);
         }

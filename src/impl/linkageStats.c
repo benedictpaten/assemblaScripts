@@ -23,10 +23,10 @@ int main(int argc, char *argv[]) {
     ///////////////////////////////////////////////////////////////////////////
 
     double bucketSize = bucketNumber / log10(upperLinkageBound);
-    int32_t *correct = st_malloc(sizeof(int32_t) * bucketNumber);
-    int32_t *aligned = st_malloc(sizeof(int32_t) * bucketNumber);
-    int32_t *samples = st_malloc(sizeof(int32_t) * bucketNumber);
-    for (int32_t i = 0; i < bucketNumber; i++) {
+    int64_t *correct = st_malloc(sizeof(int64_t) * bucketNumber);
+    int64_t *aligned = st_malloc(sizeof(int64_t) * bucketNumber);
+    int64_t *samples = st_malloc(sizeof(int64_t) * bucketNumber);
+    for (int64_t i = 0; i < bucketNumber; i++) {
         correct[i] = 0;
         aligned[i] = 0;
         samples[i] = 0;
@@ -52,18 +52,18 @@ int main(int argc, char *argv[]) {
 
     FILE *fileHandle = fopen(outputFile, "w");
     fprintf(fileHandle, "<linkage_stats>\n");
-    int32_t pMaxSize = 1;
-    int32_t cumulativeCorrect = 0;
-    int32_t cumulativeSamples = 0;
-    for (int32_t i = 0; i < bucketNumber; i++) {
+    int64_t pMaxSize = 1;
+    int64_t cumulativeCorrect = 0;
+    int64_t cumulativeSamples = 0;
+    for (int64_t i = 0; i < bucketNumber; i++) {
         if(samples[i] > 0) {
             assert(correct[i] <= samples[i]);
             assert(correct[i] >= 0);
-            int32_t maxSize = pow(10, i
+            int64_t maxSize = pow(10, i
                     /bucketSize);
             cumulativeCorrect += correct[i];
             cumulativeSamples += samples[i];
-            fprintf(fileHandle, "\t<bucket from=\"%i\" to=\"%i\" correct=\"%i\" samples=\"%i\" correct_to_samples_ratio=\"%f\" cumulative_correct=\"%i\" cumulative_samples=\"%i\" cummulate_correct_to_samples_ratio=\"%f\"/>\n",
+            fprintf(fileHandle, "\t<bucket from=\"%" PRIi64 "\" to=\"%" PRIi64 "\" correct=\"%" PRIi64 "\" samples=\"%" PRIi64 "\" correct_to_samples_ratio=\"%f\" cumulative_correct=\"%" PRIi64 "\" cumulative_samples=\"%" PRIi64 "\" cummulate_correct_to_samples_ratio=\"%f\"/>\n",
                     pMaxSize, maxSize, correct[i], samples[i], ((float) correct[i])/samples[i], cumulativeCorrect, cumulativeSamples, ((float) cumulativeCorrect)/cumulativeSamples);
             pMaxSize = maxSize + 1;
         }

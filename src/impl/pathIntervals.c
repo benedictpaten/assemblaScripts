@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     stList_append(assemblyEventStringInList, assemblyEventString);
 
     stList *intervals = stList_construct3(0, (void (*)(void *))sequenceInterval_destruct);
-    for(int32_t i=0; i<stList_length(haplotypeEventStrings); i++) {
+    for(int64_t i=0; i<stList_length(haplotypeEventStrings); i++) {
         const char *hapEventString = stList_get(haplotypeEventStrings, i);
         st_logInfo("Getting contig paths for haplotype: %s", hapEventString);
         stList *contigPaths = getContigPaths(flower, hapEventString, assemblyEventStringInList);
@@ -40,18 +40,18 @@ int main(int argc, char *argv[]) {
         stList_destruct(hapIntervals);
     }
 
-    st_logDebug("Got a total of %i intervals\n", stList_length(intervals));
+    st_logDebug("Got a total of %" PRIi64 " intervals\n", stList_length(intervals));
 
     ///////////////////////////////////////////////////////////////////////////
     // Write it out.
     ///////////////////////////////////////////////////////////////////////////
 
     FILE *fileHandle = fopen(outputFile, "w");
-    for (int32_t i = 0; i < stList_length(intervals); i++) {
+    for (int64_t i = 0; i < stList_length(intervals); i++) {
         SequenceInterval *sequenceInterval = stList_get(intervals, i);
-        st_logDebug("We have a path interval %s %i %i\n", sequenceInterval->sequenceName,
+        st_logDebug("We have a path interval %s %" PRIi64 " %" PRIi64 "\n", sequenceInterval->sequenceName,
                 sequenceInterval->start, sequenceInterval->end);
-        fprintf(fileHandle, "%s %i %i\n", sequenceInterval->sequenceName,
+        fprintf(fileHandle, "%s %" PRIi64 " %" PRIi64 "\n", sequenceInterval->sequenceName,
                 sequenceInterval->start, sequenceInterval->end);
     }
 
