@@ -7,6 +7,7 @@ This is a set of evaluation scripts developed by [Dent Earl](https://github.com/
 * [jobTree](https://github.com/benedictpaten/jobTree)
 * [sonLib](https://github.com/benedictpaten/sonLib)
 * [cactus](https://github.com/benedictpaten/cactus)
+* [cactusTools](https://github.com/benedictpaten/cactusTools)
 * [assemblaLib](https://github.com/benedictpaten/assemblaLib)
 
 ##Running Tests
