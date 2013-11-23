@@ -3,7 +3,7 @@
 	<setup>
 	</setup>
 	<caf
-		lastzArguments="--step=10 --seed=match12 --notransition --mismatch=2,100 --match=1,5 --ambiguous=iupac --identity=IDENTITY"
+		lastzArguments="--step=10 --seed=match12 --notransition --mismatch=2,100 --match=1,5 --ambiguous=iupac"
 		chunkSize="2000000" 
 		chunksPerJob="1" 
 		compressFiles="1" 
